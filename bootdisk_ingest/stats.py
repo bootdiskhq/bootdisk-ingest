@@ -1,6 +1,25 @@
 from collections import Counter
 
 
+def _count_case_mismatches(entries):
+    count = 0
+
+    for entry in entries:
+        for info in (
+            entry["files"]["referenced"].values()
+        ):
+            if info.get("path_case_mismatch"):
+                count += 1
+
+        for info in (
+            entry["files"]["discovered"].values()
+        ):
+            if info.get("path_case_mismatch"):
+                count += 1
+
+    return count
+
+
 def build_statistics(
     entries,
     disc_inventory,
@@ -115,6 +134,10 @@ def build_statistics(
         ),
         "cpu_42_placeholder_count":
             cpu_placeholder_count,
+        "path_resolution": {
+            "case_insensitive_matches":
+                _count_case_mismatches(entries),
+        },
         "referenced_files":
             dict(referenced_file_stats),
         "discovered_assets":

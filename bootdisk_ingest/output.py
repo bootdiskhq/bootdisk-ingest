@@ -26,7 +26,7 @@ def print_report(
     validation = manifest["validation"]
 
     print()
-    print("Bootdisk ingest v0.5")
+    print("Bootdisk ingest v0.5.1")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
@@ -70,6 +70,12 @@ def print_report(
             f"  {asset_type:16} "
             f"{found}/{total}"
         )
+
+    print()
+    print(
+        "Case-insensitive path-treff: "
+        f"{stats['path_resolution']['case_insensitive_matches']}"
+    )
 
     print()
     print(
