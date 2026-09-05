@@ -27,7 +27,7 @@ def print_report(
     media = manifest.get("media", {})
 
     print()
-    print("Bootdisk ingest v0.6.0")
+    print("Bootdisk ingest v0.7.0")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
@@ -107,6 +107,23 @@ def print_report(
     print(
         f"  Duplikatforekomster:       "
         f"{disc_stats['duplicate_hash_occurrences']}"
+    )
+
+    disc_identity = manifest["disc"]["content_identity"]
+
+    print()
+    print("Disc content identity:")
+    print(
+        f"  Filer:                     "
+        f"{disc_identity['file_count']}"
+    )
+    print(
+        f"  Totalt bytes:              "
+        f"{disc_identity['total_size']}"
+    )
+    print(
+        f"  Manifest SHA-256:          "
+        f"{disc_identity['manifest_sha256']}"
     )
 
     print()

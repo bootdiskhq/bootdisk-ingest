@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.6",
+  "schema_version": "0.7",
   "generator": {
     "name": "bootdisk-ingest",
-    "version": "0.6.0",
-    "generated_at": "2026-09-05T17:05:03.940944+00:00"
+    "version": "0.7.0",
+    "generated_at": "2026-09-05T17:16:02.263326+00:00"
   },
   "source": {
     "format": "kcd-dtx-v1",
@@ -20,6 +20,12 @@
       "VærkstedNy": "Cpu-Z",
       "Speciel": "PC-ens driftsutgifter",
       "SpecielTekst": "Tast inn strømforbruket ditt, pris pr. kWh samt utgifter til cd-er, skriver, programvare og spill, og få svar på hva de årlige driftskostnadene for pc-en er."
+    },
+    "content_identity": {
+      "algorithm": "sha256",
+      "file_count": 887,
+      "total_size": 630435653,
+      "manifest_sha256": "98227bf06ce1a59b1e3749578e5beedca7558d23df3b4b49f33c323bc9f421ae"
     }
   },
   "entries": [

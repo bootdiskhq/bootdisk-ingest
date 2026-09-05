@@ -8,7 +8,7 @@ from .config import (
     SCHEMA_VERSION,
     SOURCE_FORMAT,
 )
-from .hashing import build_content_identity
+from .hashing import build_content_identity, build_disc_content_identity
 from .inventory import (
     get_file_record,
     get_folder_records,
@@ -291,6 +291,9 @@ def parse_disc(
         ),
         "disc": {
             "raw": disc_raw,
+            "content_identity": build_disc_content_identity(
+                disc_inventory["files"]
+            ),
         },
         "entries": entries,
     }
