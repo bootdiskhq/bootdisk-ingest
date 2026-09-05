@@ -3,6 +3,7 @@ from pathlib import Path
 
 from bootdisk_ingest.inventory import build_disc_inventory
 from bootdisk_ingest.media import build_media_metadata
+from bootdisk_ingest.iso9660 import inspect_iso9660
 from bootdisk_ingest.parser_kcd_dtx_v1 import parse_disc
 from bootdisk_ingest.stats import build_statistics
 from bootdisk_ingest.validation import build_validation
@@ -52,6 +53,10 @@ def main():
     )
 
     manifest["media"] = build_media_metadata(
+        args.image
+    )
+
+    manifest["disc"]["filesystem"] = inspect_iso9660(
         args.image
     )
 

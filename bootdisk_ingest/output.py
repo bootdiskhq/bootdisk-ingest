@@ -27,7 +27,7 @@ def print_report(
     media = manifest.get("media", {})
 
     print()
-    print("Bootdisk ingest v0.7.0")
+    print("Bootdisk ingest v0.8.0")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
@@ -166,6 +166,64 @@ def print_report(
         print(
             "  Ingen image-fil oppgitt."
         )
+
+    print()
+    print("Filsystem:")
+
+    filesystem = manifest["disc"].get("filesystem", {})
+
+    if filesystem.get("available") and filesystem.get("iso9660"):
+        print("  Type:                      iso9660")
+        primary = filesystem.get("primary_volume_descriptor")
+
+        if primary is not None:
+            print(
+                f"  Volume ID:                 "
+                f"{primary['volume_id']}"
+            )
+            print(
+                f"  System ID:                 "
+                f"{primary['system_id']}"
+            )
+
+            block_size = primary["logical_block_size"]
+            print(
+                f"  Logical block size:        "
+                f"{block_size['value']}"
+            )
+
+            volume_blocks = primary["volume_space_size_blocks"]
+            print(
+                f"  Volume blocks:             "
+                f"{volume_blocks['value']}"
+            )
+
+        joliet = filesystem.get("joliet", {})
+        print(
+            f"  Joliet:                    "
+            f"{'ja' if joliet.get('present') else 'nei'}"
+        )
+
+        if joliet.get("present"):
+            levels = sorted(
+                {item["level"] for item in joliet["descriptors"]}
+            )
+            print(
+                f"  Joliet level:              "
+                + ", ".join(str(level) for level in levels)
+            )
+
+        mismatches = filesystem.get(
+            "numeric_endianness_mismatches", []
+        )
+        print(
+            f"  Endian-avvik:              "
+            f"{len(mismatches)}"
+        )
+    elif filesystem.get("available"):
+        print("  ISO9660 ikke funnet.")
+    else:
+        print("  Ingen image-fil oppgitt.")
 
     print()
     print("Kategorier:")

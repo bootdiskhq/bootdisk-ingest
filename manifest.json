@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.7",
+  "schema_version": "0.8",
   "generator": {
     "name": "bootdisk-ingest",
-    "version": "0.7.0",
-    "generated_at": "2026-09-05T17:16:02.263326+00:00"
+    "version": "0.8.0",
+    "generated_at": "2026-09-05T17:29:04.135274+00:00"
   },
   "source": {
     "format": "kcd-dtx-v1",
@@ -26,6 +26,102 @@
       "file_count": 887,
       "total_size": 630435653,
       "manifest_sha256": "98227bf06ce1a59b1e3749578e5beedca7558d23df3b4b49f33c323bc9f421ae"
+    },
+    "filesystem": {
+      "available": true,
+      "type": "iso9660",
+      "iso9660": true,
+      "descriptor_count": 3,
+      "terminator_seen": true,
+      "primary_volume_descriptor": {
+        "sector": 16,
+        "descriptor": {
+          "type": 1,
+          "identifier": "CD001",
+          "version": 1
+        },
+        "system_id": "",
+        "volume_id": "K_CD_15_2001",
+        "volume_space_size_blocks": {
+          "value": 308681,
+          "little_endian": 308681,
+          "big_endian": 308681,
+          "consistent": true
+        },
+        "volume_set_size": {
+          "value": 1,
+          "little_endian": 1,
+          "big_endian": 1,
+          "consistent": true
+        },
+        "volume_sequence_number": {
+          "value": 1,
+          "little_endian": 1,
+          "big_endian": 1,
+          "consistent": true
+        },
+        "logical_block_size": {
+          "value": 2048,
+          "little_endian": 2048,
+          "big_endian": 2048,
+          "consistent": true
+        },
+        "path_table_size": {
+          "value": 1390,
+          "little_endian": 1390,
+          "big_endian": 1390,
+          "consistent": true
+        },
+        "volume_set_id": "",
+        "publisher_id": "",
+        "data_preparer_id": "",
+        "application_id": "NERO - BURNING ROM",
+        "volume_creation_time": {
+          "raw": "2001100914100000",
+          "timezone_offset_quarters": 8,
+          "timezone_offset_minutes": 120,
+          "iso8601": "2001-10-09T14:10:00.000+02:00",
+          "valid": true,
+          "interpretation": "parsed"
+        },
+        "volume_modification_time": {
+          "raw": "2001100914100000",
+          "timezone_offset_quarters": 8,
+          "timezone_offset_minutes": 120,
+          "iso8601": "2001-10-09T14:10:00.000+02:00",
+          "valid": true,
+          "interpretation": "parsed"
+        },
+        "volume_expiration_time": {
+          "raw": "0000000000000000",
+          "timezone_offset_quarters": 0,
+          "timezone_offset_minutes": 0,
+          "iso8601": null,
+          "valid": false,
+          "interpretation": "unspecified"
+        },
+        "volume_effective_time": {
+          "raw": "0000000000000000",
+          "timezone_offset_quarters": 0,
+          "timezone_offset_minutes": 0,
+          "iso8601": null,
+          "valid": false,
+          "interpretation": "unspecified"
+        },
+        "file_structure_version": 1
+      },
+      "joliet": {
+        "present": true,
+        "descriptors": [
+          {
+            "sector": 17,
+            "level": 3,
+            "escape_sequence": "%/E",
+            "volume_id": "K-CD 15 2001"
+          }
+        ]
+      },
+      "numeric_endianness_mismatches": []
     }
   },
   "entries": [
