@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.5",
+  "schema_version": "0.6",
   "generator": {
     "name": "bootdisk-ingest",
-    "version": "0.5.0",
-    "generated_at": "2026-09-05T16:39:34.078995+00:00"
+    "version": "0.6.0",
+    "generated_at": "2026-09-05T17:05:03.940944+00:00"
   },
   "source": {
     "format": "kcd-dtx-v1",
@@ -72,11 +72,21 @@
         "referenced": {
           "installer": {
             "path": "Acrobat/rp500enu.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 10236296,
+            "sha256": "79522eb4edbcee603e0f971cba660365ecb33595953d787e9909593a51b2717d",
+            "resolved_path": "Acrobat/RP500ENU.EXE",
+            "path_case_mismatch": true
           },
           "run": {
             "path": "Acrobat/Acrobat.PDF",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 631551,
+            "sha256": "fa03e4ad002b9b34b745baf1ac5931c6864299e973a81307795faec1a23305d0",
+            "resolved_path": "Acrobat/Acrobat.pdf",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -432,11 +442,21 @@
         "referenced": {
           "installer": {
             "path": "Explorer5/No/IE5Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 504592,
+            "sha256": "352d4a52efab3fb8c48dcc2b24569ecd8c27902d573f898f35bea73676f346bc",
+            "resolved_path": "Explorer5/NO/ie5setup.exe",
+            "path_case_mismatch": true
           },
           "run": {
             "path": "Explorer5/Explorer.PDF",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 542495,
+            "sha256": "a52f86248e6b822c156b323878c7d0b14deeb0f41be604494e04a1cd7f5bb9de",
+            "resolved_path": "Explorer5/Explorer.pdf",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -596,7 +616,12 @@
         "referenced": {
           "installer": {
             "path": "FirstPage/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 59904,
+            "sha256": "26adea53490125fd31e300da97ef48b9ddc583753789051746b9a31406b418cf",
+            "resolved_path": "FirstPage/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -1054,7 +1079,12 @@
         "referenced": {
           "installer": {
             "path": "AVG Antivirus Pro/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 200784,
+            "sha256": "0acea3d8103d89a025d14ef2b87211053c462abd46fa25b5cefb6813cf413bfa",
+            "resolved_path": "AVG Antivirus Pro/SETUP.EXE",
+            "path_case_mismatch": true
           },
           "run": {
             "path": "AVG Antivirus Pro/AVG.PDF",
@@ -1163,11 +1193,21 @@
         "referenced": {
           "installer": {
             "path": "WinAmp/WinAmp276_full.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 2229552,
+            "sha256": "b609c58ca767f0809fe30775e2dd9f28315f85f2972196b2a5aca4a84a2964ad",
+            "resolved_path": "WinAmp/winamp276_full.exe",
+            "path_case_mismatch": true
           },
           "run": {
             "path": "WinAmp/winamp.pdf",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 601748,
+            "sha256": "201ea7ce2f9426f02c0d2c90daffdf0f8eb981060398c6b2af246c0ab8842385",
+            "resolved_path": "WinAmp/WinAmp.pdf",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -1255,11 +1295,21 @@
         "referenced": {
           "installer": {
             "path": "WinZip/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 86016,
+            "sha256": "64a155d9abd5fd5a004d0c59310a7407936265e691f503a9954b12d54b2fa7d1",
+            "resolved_path": "WinZip/SETUP.EXE",
+            "path_case_mismatch": true
           },
           "run": {
             "path": "WinZip/Winzip.PDF",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 141085,
+            "sha256": "8b4d55db29534879eed05b9e05a1780ed97a8bcb638a531f3fb0e7a69a5cbd83",
+            "resolved_path": "WinZip/Winzip.pdf",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -1450,7 +1500,12 @@
         "referenced": {
           "installer": {
             "path": "Clipart/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 135680,
+            "sha256": "cb4f893575d8debeadd96ad2cb9556c9be83eab072982d12fcd53cb1e0d8b5e6",
+            "resolved_path": "Clipart/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -1853,7 +1908,12 @@
         "referenced": {
           "installer": {
             "path": "Tools/cpuz/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 386140,
+            "sha256": "cbcb5b1951923a1a612778680379405ab1ac6b6651e5e742479aaf905e083fa6",
+            "resolved_path": "Tools/CPUZ/Setup.exe",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -1863,20 +1923,32 @@
           },
           "screenshot": {
             "path": "Tools/cpuz/Shot.jpg",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 34016,
+            "sha256": "ce97d6c6c09d162a7066b4a8f6e8b39673e1e56c9afb72ad8c5e7d4d2e2e3279",
+            "resolved_path": "Tools/CPUZ/Shot.jpg",
+            "path_case_mismatch": true
           },
           "icon": {
             "path": "Tools/cpuz/Ikon.bmp",
             "exists": false
           }
         },
-        "inventory_refs": []
+        "inventory_refs": [
+          "Tools/CPUZ/cpu-z-110.zip",
+          "Tools/CPUZ/CPUZ.EXE",
+          "Tools/CPUZ/CPUZ.SYS",
+          "Tools/CPUZ/CPUZ.VXD",
+          "Tools/CPUZ/Setup.exe",
+          "Tools/CPUZ/Shot.jpg"
+        ]
       },
       "content_identity": {
         "algorithm": "sha256",
-        "file_count": 0,
-        "total_size": 0,
-        "manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        "file_count": 6,
+        "total_size": 783528,
+        "manifest_sha256": "5dc2a1d9fcd72c75b876a6db69c4e9a3466dc65c998d1affc14c6b5d246f6d40"
       }
     },
     {
@@ -2050,7 +2122,12 @@
         "discovered": {
           "description_rtf": {
             "path": "BilleTrille/No.rtf",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 1234,
+            "sha256": "7e685532cc67cd8ce9c892005643a8e11e5081fba32f45eaf6c57cf970a7fd18",
+            "resolved_path": "BilleTrille/No.RTF",
+            "path_case_mismatch": true
           },
           "screenshot": {
             "path": "BilleTrille/Shot.jpg",
@@ -2280,7 +2357,12 @@
         "referenced": {
           "installer": {
             "path": "Bugnosis/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 59904,
+            "sha256": "83441525fb5aebe10892cfbc931395e2bb1f68c8720e49bb58749cb95981f06d",
+            "resolved_path": "Bugnosis/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -2401,7 +2483,12 @@
         "referenced": {
           "installer": {
             "path": "ClickPuzzle/Clickp.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 282231,
+            "sha256": "e5bda58ccf46bcdc7abf91b8804a9498ffe6e4c747df2048eb7381cfd4b84439",
+            "resolved_path": "ClickPuzzle/CLICKP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -2491,7 +2578,12 @@
         "referenced": {
           "installer": {
             "path": "DrGoo/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 46592,
+            "sha256": "f6020d7c4bca394a88c9c7bd717397530eb3fc81559fd52204ad9e03fdc0c44d",
+            "resolved_path": "DrGoo/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -2584,7 +2676,12 @@
         "referenced": {
           "installer": {
             "path": "Deer Avenger/DA4_Demo_Install.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 11274378,
+            "sha256": "43a95930506c15f6119acbc2648673aa3730bd5aa04f7d21ea8d9f964e4df348",
+            "resolved_path": "Deer Avenger/DA4_Demo_Install.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -2672,7 +2769,12 @@
         "referenced": {
           "installer": {
             "path": "Fire Fighter/firepk.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 146740,
+            "sha256": "4704d9d961f6d878dbdd5a626913a9efa4cc3ccc24eed72ac86cfcf2c914d7b3",
+            "resolved_path": "Fire Fighter/FIREPK.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -3126,7 +3228,12 @@
         "referenced": {
           "installer": {
             "path": "WorkPace/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 58880,
+            "sha256": "0ddf428756e68f4fb903b40f73afc58888854f177ab080888903e2ed48b254d2",
+            "resolved_path": "WorkPace/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -3322,7 +3429,12 @@
           },
           "run": {
             "path": "Mutant Xpiders/Mut_xpid.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 214194,
+            "sha256": "4b194318e30a348abfd900349af875157249812449b5a5b30364ee775c1a0265",
+            "resolved_path": "Mutant Xpiders/MUT_XPID.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -3531,7 +3643,12 @@
         "referenced": {
           "installer": {
             "path": "Panorama Factory/Setup.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 59904,
+            "sha256": "83441525fb5aebe10892cfbc931395e2bb1f68c8720e49bb58749cb95981f06d",
+            "resolved_path": "Panorama Factory/SETUP.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -3728,7 +3845,12 @@
         "referenced": {
           "installer": {
             "path": "PuzzleJig/puzzj11b.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 934468,
+            "sha256": "5c285f04502cd131dfcf2758e5363a828b3d23d4be6526cf1ecfe3dc661dfdfe",
+            "resolved_path": "PuzzleJig/PUZZJ11B.EXE",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -3927,7 +4049,12 @@
           },
           "run": {
             "path": "Resize/Resize.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 117760,
+            "sha256": "38ef408667533d14e196ce2b5b4dd87a98efd53798d7f3e9095b14d13426b89d",
+            "resolved_path": "Resize/resize.exe",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -4027,7 +4154,12 @@
           },
           "run": {
             "path": "Shoot/Shoot.exe",
-            "exists": false
+            "exists": true,
+            "is_file": true,
+            "size": 11571200,
+            "sha256": "3fdfc28309a7bedc48a04d7e946363741bdd7e697c1e9e985825cb451ffeab20",
+            "resolved_path": "Shoot/SHOOT.exe",
+            "path_case_mismatch": true
           }
         },
         "discovered": {
@@ -4076,6 +4208,13 @@
       }
     }
   ],
+  "media": {
+    "available": true,
+    "format": "iso",
+    "size": 632492032,
+    "sha256": "6379da2a559f114941aa206fef0e45710662a519c23b76fe8e145ffa4d78daf3",
+    "media_id": "sha256:6379da2a559f114941aa206fef0e45710662a519c23b76fe8e145ffa4d78daf3"
+  },
   "file_inventory": [
     {
       "path": "Acrobat/Acrobat.pdf",
@@ -8621,23 +8760,26 @@
       "Værksted": 1
     },
     "cpu_42_placeholder_count": 22,
+    "path_resolution": {
+      "case_insensitive_matches": 25
+    },
     "referenced_files": {
       "installer_total": 32,
+      "installer_found": 32,
       "run_total": 17,
-      "run_found": 10,
-      "installer_found": 16
+      "run_found": 17
     },
     "discovered_assets": {
       "description_rtf_total": 39,
-      "description_rtf_found": 37,
+      "description_rtf_found": 38,
       "screenshot_total": 39,
-      "screenshot_found": 38,
+      "screenshot_found": 39,
       "icon_total": 39,
       "icon_found": 38
     },
     "entry_inventory": {
-      "file_references": 674,
-      "total_bytes_across_entries": 555876569
+      "file_references": 680,
+      "total_bytes_across_entries": 556660097
     },
     "disc_inventory": {
       "physical_files": 887,
@@ -8647,150 +8789,9 @@
     }
   },
   "validation": {
-    "valid": false,
-    "warnings": [
-      "23 explicitly referenced files are missing"
-    ],
-    "missing_referenced_files": [
-      {
-        "source_id": "K24",
-        "title": "Acrobat Reader 5.0",
-        "type": "installer",
-        "path": "Acrobat/rp500enu.exe"
-      },
-      {
-        "source_id": "K24",
-        "title": "Acrobat Reader 5.0",
-        "type": "run",
-        "path": "Acrobat/Acrobat.PDF"
-      },
-      {
-        "source_id": "K29",
-        "title": "Internet Explorer 5.5",
-        "type": "installer",
-        "path": "Explorer5/No/IE5Setup.exe"
-      },
-      {
-        "source_id": "K29",
-        "title": "Internet Explorer 5.5",
-        "type": "run",
-        "path": "Explorer5/Explorer.PDF"
-      },
-      {
-        "source_id": "K30",
-        "title": "1st Page 2000",
-        "type": "installer",
-        "path": "FirstPage/Setup.exe"
-      },
-      {
-        "source_id": "K35",
-        "title": "AVG Antivirus Pro",
-        "type": "installer",
-        "path": "AVG Antivirus Pro/Setup.exe"
-      },
-      {
-        "source_id": "K37",
-        "title": "WinAmp 2.76",
-        "type": "installer",
-        "path": "WinAmp/WinAmp276_full.exe"
-      },
-      {
-        "source_id": "K37",
-        "title": "WinAmp 2.76",
-        "type": "run",
-        "path": "WinAmp/winamp.pdf"
-      },
-      {
-        "source_id": "K38",
-        "title": "WinZip 8.0",
-        "type": "installer",
-        "path": "WinZip/Setup.exe"
-      },
-      {
-        "source_id": "K38",
-        "title": "WinZip 8.0",
-        "type": "run",
-        "path": "WinZip/Winzip.PDF"
-      },
-      {
-        "source_id": "K40",
-        "title": "101 Photo-Objects",
-        "type": "installer",
-        "path": "Clipart/Setup.exe"
-      },
-      {
-        "source_id": "K23",
-        "title": "Cpu-Z",
-        "type": "installer",
-        "path": "Tools/cpuz/Setup.exe"
-      },
-      {
-        "source_id": "K5",
-        "title": "Bugnosis",
-        "type": "installer",
-        "path": "Bugnosis/Setup.exe"
-      },
-      {
-        "source_id": "K6",
-        "title": "ClickPuzzle",
-        "type": "installer",
-        "path": "ClickPuzzle/Clickp.exe"
-      },
-      {
-        "source_id": "K7",
-        "title": "Dr. Goo",
-        "type": "installer",
-        "path": "DrGoo/Setup.exe"
-      },
-      {
-        "source_id": "K8",
-        "title": "Deer Avenger 4",
-        "type": "installer",
-        "path": "Deer Avenger/DA4_Demo_Install.exe"
-      },
-      {
-        "source_id": "K9",
-        "title": "Fire Fighter",
-        "type": "installer",
-        "path": "Fire Fighter/firepk.exe"
-      },
-      {
-        "source_id": "K14",
-        "title": "WorkPace",
-        "type": "installer",
-        "path": "WorkPace/Setup.exe"
-      },
-      {
-        "source_id": "K15",
-        "title": "Mutant Xpiders",
-        "type": "run",
-        "path": "Mutant Xpiders/Mut_xpid.exe"
-      },
-      {
-        "source_id": "K17",
-        "title": "Panorama Factory",
-        "type": "installer",
-        "path": "Panorama Factory/Setup.exe"
-      },
-      {
-        "source_id": "K19",
-        "title": "PuzzleJig",
-        "type": "installer",
-        "path": "PuzzleJig/puzzj11b.exe"
-      },
-      {
-        "source_id": "K21",
-        "title": "Resize Browser",
-        "type": "run",
-        "path": "Resize/Resize.exe"
-      },
-      {
-        "source_id": "K22",
-        "title": "Shoot && Relax",
-        "type": "run",
-        "path": "Shoot/Shoot.exe"
-      }
-    ],
+    "valid": true,
+    "warnings": [],
+    "missing_referenced_files": [],
     "missing_discovered_assets": [
       {
         "source_id": "K23",
@@ -8801,20 +8802,8 @@
       {
         "source_id": "K23",
         "title": "Cpu-Z",
-        "type": "screenshot",
-        "path": "Tools/cpuz/Shot.jpg"
-      },
-      {
-        "source_id": "K23",
-        "title": "Cpu-Z",
         "type": "icon",
         "path": "Tools/cpuz/Ikon.bmp"
-      },
-      {
-        "source_id": "K3",
-        "title": "Bille og Trille",
-        "type": "description_rtf",
-        "path": "BilleTrille/No.rtf"
       }
     ]
   }

@@ -24,9 +24,10 @@ def print_report(
     entries = manifest["entries"]
     stats = manifest["statistics"]
     validation = manifest["validation"]
+    media = manifest.get("media", {})
 
     print()
-    print("Bootdisk ingest v0.5.1")
+    print("Bootdisk ingest v0.6.0")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
@@ -123,6 +124,31 @@ def print_report(
         f"  Bytes på tvers av entries: "
         f"{entry_stats['total_bytes_across_entries']}"
     )
+
+    print()
+    print("Medieidentitet:")
+
+    if media.get("available"):
+        print(
+            f"  Format:                    "
+            f"{media['format']}"
+        )
+        print(
+            f"  Størrelse:                 "
+            f"{media['size']}"
+        )
+        print(
+            f"  SHA-256:                   "
+            f"{media['sha256']}"
+        )
+        print(
+            f"  Media ID:                  "
+            f"{media['media_id']}"
+        )
+    else:
+        print(
+            "  Ingen image-fil oppgitt."
+        )
 
     print()
     print("Kategorier:")
