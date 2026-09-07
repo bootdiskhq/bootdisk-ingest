@@ -1,3 +1,27 @@
+# Bootdisk ingest v0.9.0
+
+v0.9.0 begins the source-agnostic Bootdisk core domain model from ADR-0004.
+
+## Milestone 1
+
+- Adds `bootdisk_ingest/core/`.
+- Defines Source, Collection, Media, Entry, Occurrence, Artifact,
+  SoftwareRelease and Software.
+- Defines observed, derived, interpreted and curated knowledge kinds.
+- Adds canonical `sha256:<digest>` Artifact identity.
+- Adds the `adapters/` boundary and a K-CD adapter namespace.
+- Deliberately leaves the verified v0.8 K-CD parser in place until regression
+  tests protect its later move.
+- Supports standalone Artifacts without magazine, Media, Entry or catalog data.
+
+> **Ingest should be lossless. Parser observes more than it interprets.**
+
+Reference K-CD 15/2001 content identity must remain:
+
+`98227bf06ce1a59b1e3749578e5beedca7558d23df3b4b49f33c323bc9f421ae`
+
+---
+
 # Bootdisk ingest v0.8.0
 
 v0.8.0 adds direct observation of ISO9660 filesystem metadata from the original disc image.

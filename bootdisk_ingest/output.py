@@ -27,7 +27,7 @@ def print_report(
     media = manifest.get("media", {})
 
     print()
-    print("Bootdisk ingest v0.8.0")
+    print("Bootdisk ingest v0.9.0")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
