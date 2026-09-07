@@ -1,5 +1,6 @@
 import json
 
+from . import __version__
 from .config import KNOWN_ASSETS
 
 
@@ -27,7 +28,7 @@ def print_report(
     media = manifest.get("media", {})
 
     print()
-    print("Bootdisk ingest v0.9.0")
+    print(f"Bootdisk ingest v{__version__}")
     print("=" * 40)
     print(f"Fant {len(entries)} poster")
     print()
