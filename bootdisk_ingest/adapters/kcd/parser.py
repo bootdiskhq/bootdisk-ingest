@@ -1,24 +1,24 @@
 import configparser
 from datetime import datetime, timezone
 
-from .config import (
+from bootdisk_ingest.config import (
     KNOWN_ASSETS,
     KNOWN_NON_CATEGORY_FIELDS,
     PARSER_VERSION,
     SCHEMA_VERSION,
     SOURCE_FORMAT,
 )
-from .hashing import build_content_identity, build_disc_content_identity
-from .inventory import (
+from bootdisk_ingest.core.identity import build_content_identity
+from bootdisk_ingest.hashing import build_disc_content_identity
+from bootdisk_ingest.inventory import (
     get_file_record,
     get_folder_records,
 )
-from .paths import (
+from bootdisk_ingest.paths import (
     normalize_string,
     normalize_windows_path,
     relative_disc_path,
 )
-
 
 def parse_int(value):
     value = normalize_string(value)

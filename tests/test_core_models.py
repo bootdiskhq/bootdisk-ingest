@@ -307,6 +307,12 @@ class CoreModelTests(unittest.TestCase):
         )   
 
 
+class KcdParserImportTests(unittest.TestCase):
+   def test_kcd_parser_can_be_imported(self):
+       from bootdisk_ingest.adapters.kcd import parser
+
+       self.assertIsNotNone(parser)
+
 
 if __name__ == "__main__":
     unittest.main()
