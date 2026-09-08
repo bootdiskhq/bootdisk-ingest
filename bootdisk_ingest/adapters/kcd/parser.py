@@ -9,7 +9,6 @@ from bootdisk_ingest.config import (
     SOURCE_FORMAT,
 )
 from bootdisk_ingest.core.identity import build_content_identity
-from bootdisk_ingest.hashing import build_disc_content_identity
 from bootdisk_ingest.inventory import (
     get_file_record,
     get_folder_records,
@@ -291,7 +290,7 @@ def parse_disc(
         ),
         "disc": {
             "raw": disc_raw,
-            "content_identity": build_disc_content_identity(
+            "content_identity": build_content_identity(
                 disc_inventory["files"]
             ),
         },
