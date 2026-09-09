@@ -12,7 +12,7 @@ from .core.inventory import (
 )
 
 
-def build_disc_inventory(disc_root):
+def build_inventory(source_root):
     """Build the legacy disc inventory from the generic core inventory.
 
     The public structure returned by this function is intentionally kept
@@ -23,7 +23,7 @@ def build_disc_inventory(disc_root):
     """
 
     # Observe the files through the generic preservation core.
-    records = build_directory_inventory(disc_root)
+    records = build_directory_inventory(source_root)
 
     # Convert FileRecord objects back to the historical dictionary format.
     # Existing callers can therefore continue to operate unchanged while the
@@ -149,3 +149,8 @@ def get_folder_records(disc_inventory, folder):
         }
         for record in matching_records
     ]
+
+
+def build_disc_inventory(disc_root):
+    """Compatibility entry point for pre-1.0 callers."""
+    return build_inventory(disc_root)

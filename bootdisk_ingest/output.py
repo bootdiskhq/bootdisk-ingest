@@ -4,18 +4,33 @@ from . import __version__
 from .config import KNOWN_ASSETS
 
 
-def write_manifest(
-    manifest,
-    output_file,
-):
-    output_file.write_text(
-        json.dumps(
-            manifest,
-            indent=2,
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+def write_manifest(manifest, output_file, *, overwrite=False):
+    """Publish complete JSON atomically; an existing file requires opt-in.
+
+    A sibling temporary file keeps publication on one filesystem. Hard-link
+    creation gives the no-overwrite mode an atomic existence check.
+    """
+    import os
+    import tempfile
+    from pathlib import Path
+
+    output_file = Path(output_file)
+    payload = json.dumps(manifest, indent=2, ensure_ascii=False, allow_nan=False) + "\n"
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n",
+                                         dir=output_file.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        if overwrite:
+            os.replace(temporary, output_file)
+        else:
+            os.link(temporary, output_file)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def print_report(

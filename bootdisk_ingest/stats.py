@@ -1,3 +1,4 @@
+"""K-CD manifest summaries; these are projections, not catalog conclusions."""
 from collections import Counter
 
 
@@ -24,6 +25,7 @@ def build_statistics(
     entries,
     disc_inventory,
 ):
+    """Count physical occurrences separately from repeated editorial references."""
     key_occurrences = Counter()
     key_values = Counter()
     category_occurrences = Counter()

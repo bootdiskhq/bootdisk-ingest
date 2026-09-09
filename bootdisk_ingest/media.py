@@ -1,9 +1,11 @@
+"""Identity of the exact supplied image bytes, independent of source metadata."""
 from pathlib import Path
 
-from .hashing import sha256_file
+from .core.hashing import sha256_file
 
 
 def _guess_format(image_path):
+    """Return a filename-extension hint, not a verified media format."""
     suffix = image_path.suffix.lower()
 
     if suffix == ".iso":

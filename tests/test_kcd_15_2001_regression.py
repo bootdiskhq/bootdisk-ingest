@@ -27,12 +27,6 @@ class Kcd152001RegressionTest(unittest.TestCase):
         repo_root = Path(__file__).resolve().parents[1]
         manifest_path = repo_root / "manifest.json"
 
-        if not manifest_path.exists():
-            raise unittest.SkipTest(
-                "manifest.json finnes ikke i repo-roten. "
-                "Kjør bootdisk-ingest mot K-CD 15/2001 først."
-            )
-
         with manifest_path.open("r", encoding="utf-8") as fh:
             cls.manifest = json.load(fh)
 

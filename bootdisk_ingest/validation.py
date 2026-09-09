@@ -1,4 +1,6 @@
+"""Validation of K-CD references, not certification of preservation completeness."""
 def build_validation(entries):
+    """Missing explicit references invalidate; optional editorial assets do not."""
     warnings = []
     referenced_missing = []
     discovered_missing = []

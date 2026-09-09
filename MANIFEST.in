@@ -1,0 +1,4 @@
+include manifest.json
+include bootdisk_ingest.py
+recursive-include tests *.py
+recursive-include docs *.md

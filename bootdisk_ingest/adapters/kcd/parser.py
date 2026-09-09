@@ -1,19 +1,25 @@
+"""Observe K-CD metadata while keeping interpretations separate from evidence.
+
+The INI view is convenient but cannot preserve duplicates, comments or undecodable
+bytes. The manifest therefore also carries the exact metadata bytes.
+"""
+import base64
+import hashlib
+from pathlib import Path
 import configparser
 from datetime import datetime, timezone
 
 from bootdisk_ingest.config import (
-    KNOWN_ASSETS,
-    KNOWN_NON_CATEGORY_FIELDS,
     PARSER_VERSION,
     SCHEMA_VERSION,
-    SOURCE_FORMAT,
 )
+from .config import KNOWN_ASSETS, KNOWN_NON_CATEGORY_FIELDS, SOURCE_FORMAT
 from bootdisk_ingest.core.identity import build_content_identity
 from bootdisk_ingest.inventory import (
     get_file_record,
     get_folder_records,
 )
-from bootdisk_ingest.paths import (
+from .paths import (
     normalize_string,
     normalize_windows_path,
     relative_disc_path,
@@ -76,6 +82,7 @@ def build_entry(
     section_name,
     section,
 ):
+    """Project editorial values without replacing their source evidence."""
     raw = dict(section)
 
     folder = normalize_windows_path(
@@ -234,25 +241,36 @@ def build_source_metadata(
 def parse_disc(
     disc_root,
     disc_inventory,
+    *,
+    generated_at=None,
 ):
-    dtx_file = disc_root / "K.DTX"
+    disc_root = Path(disc_root)
+    metadata = get_file_record(disc_inventory, "K.DTX")
+    dtx_file = disc_root / metadata.get("resolved_path", "K.DTX")
 
-    if not dtx_file.exists():
-        raise SystemExit(
-            f"Fant ikke {dtx_file}\n"
-            "Kjør scriptet fra roten av den monterte K-CD-en."
-        )
+    if not metadata.get("exists"):
+        raise ValueError("K.DTX is missing from the source inventory")
+    raw_bytes = dtx_file.read_bytes()
+    if len(raw_bytes) != metadata["size"] or hashlib.sha256(raw_bytes).hexdigest() != metadata["sha256"]:
+        raise ValueError("K.DTX changed after inventory; ingest a stable source")
 
-    config = configparser.ConfigParser(
-        strict=False,
-        interpolation=None,
-    )
+    warnings = []
+    try:
+        text = raw_bytes.decode("cp1252")
+    except UnicodeDecodeError:
+        text = raw_bytes.decode("cp1252", errors="replace")
+        warnings.append("Undefined CP1252 bytes replaced in parsed view; original bytes retained")
+
+    # Retain the historical last-value-wins INI projection, but make loss in
+    # that projection explicit and keep byte-level evidence for future parsers.
+    probe = configparser.ConfigParser(interpolation=None)
+    probe.optionxform = str
+    try:
+        probe.read_string(text)
+    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError):
+        warnings.append("Duplicate INI fields or sections; parsed view uses the last value")
+    config = configparser.ConfigParser(strict=False, interpolation=None)
     config.optionxform = str
-
-    text = dtx_file.read_text(
-        encoding="cp1252",
-        errors="replace",
-    )
     config.read_string(text)
 
     disc_raw = (
@@ -276,18 +294,21 @@ def parse_disc(
                 )
             )
 
+    source = build_source_metadata(disc_inventory)
+    source["dtx_file"]["raw_base64"] = base64.b64encode(raw_bytes).decode("ascii")
+    if metadata.get("resolved_path"):
+        source["dtx_file"]["resolved_path"] = metadata["resolved_path"]
+    source["parser_warnings"] = warnings
+    source["sections"] = {name: dict(config[name]) for name in config.sections()}
+    source["defaults"] = dict(config.defaults())
     return {
         "schema_version": SCHEMA_VERSION,
         "generator": {
             "name": "bootdisk-ingest",
             "version": PARSER_VERSION,
-            "generated_at": datetime.now(
-                timezone.utc
-            ).isoformat(),
+            "generated_at": generated_at or datetime.now(timezone.utc).isoformat(),
         },
-        "source": build_source_metadata(
-            disc_inventory
-        ),
+        "source": source,
         "disc": {
             "raw": disc_raw,
             "content_identity": build_content_identity(

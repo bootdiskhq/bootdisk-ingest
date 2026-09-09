@@ -1,3 +1,8 @@
+"""Bounded observations of ISO9660 descriptors, not an image filesystem driver.
+
+Unrecognized and conflicting fields remain visible; this reader neither mounts
+images nor establishes correspondence with a supplied directory inventory.
+"""
 from pathlib import Path
 
 SECTOR_SIZE = 2048
@@ -155,6 +160,7 @@ def _parse_joliet_descriptor(block, sector):
 
 
 def inspect_iso9660(image_path):
+    """Inspect up to 128 descriptors without treating recognition as validation."""
     if image_path is None:
         return {"available": False}
 

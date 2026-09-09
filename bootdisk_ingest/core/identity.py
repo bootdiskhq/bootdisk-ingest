@@ -18,6 +18,11 @@ def _field(record, name):
     return getattr(record, name)
 
 def build_content_identity(file_records):
+    """Hash sorted UTF-8 path/NUL/digest/newline records (legacy contract).
+
+    Size is reported but intentionally excluded from the digest. Never change
+    this framing without a separately versioned identity algorithm.
+    """
     digest = hashlib.sha256()
     total_size = 0
 

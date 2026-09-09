@@ -24,7 +24,6 @@ class FileRecord:
     sha256: str
 
 @dataclass(slots=True)
-
 class FileInventory:
     """Indexed collection of preserved file observations.
 
@@ -57,8 +56,8 @@ class FileInventory:
         for record in records:
             key = record.path.casefold()
 
-            # Preserve the first occurrence if multiple observed paths differ
-            # only by case. This mirrors the behaviour of the legacy inventory.
+            # Keep a representative for the compatibility index. find() rejects
+            # ambiguous fallback instead of treating this representative as evidence.
             if key not in by_casefold_path:
                 by_casefold_path[key] = record
 
@@ -94,6 +93,9 @@ class FileInventory:
         )
 
         if record is not None:
+            matches = [item for item in self.records if item.path.casefold() == relative_path.casefold()]
+            if len(matches) > 1:
+                raise ValueError(f"Ambiguous case-insensitive path: {relative_path}")
             return record, True
 
         return None, False
@@ -130,7 +132,7 @@ class FileInventory:
         folded_folder = folder.casefold()
         folded_prefix = folded_folder.rstrip("/") + "/"
 
-        return [
+        matches = [
             record
             for record in self.records
             if (
@@ -138,6 +140,13 @@ class FileInventory:
                 or record.path.casefold().startswith(folded_prefix)
             )
         ]
+
+        # A fallback must not merge distinct observed directories into one entry.
+        depth = len(folder.rstrip("/").split("/"))
+        observed_folders = {"/".join(record.path.split("/")[:depth]) for record in matches}
+        if len(observed_folders) > 1:
+            raise ValueError(f"Ambiguous case-insensitive folder: {folder}")
+        return matches
 
 def build_directory_inventory(root):
     """Build a deterministic inventory of all files below a directory.
@@ -151,28 +160,40 @@ def build_directory_inventory(root):
     """
 
     root = Path(root)
+    if not root.is_dir():
+        raise ValueError("Inventory root must be an existing directory")
     records = []
+    paths = []
+    # Explicit traversal propagates access errors. Silently skipping unreadable
+    # directories would produce a plausible but incomplete preservation record.
+    def discover(directory):
+        import os
+        import stat
+        with os.scandir(directory) as children:
+            for child in children:
+                mode = child.stat(follow_symlinks=False).st_mode
+                if stat.S_ISLNK(mode):
+                    raise ValueError(f"Symbolic links are not supported: {child.path}")
+                if stat.S_ISDIR(mode):
+                    discover(Path(child.path))
+                elif stat.S_ISREG(mode):
+                    paths.append(Path(child.path))
+                else:
+                    raise ValueError(f"Special files are not supported: {child.path}")
 
-    """Discover files first, then sort them by their relative source path.
-
-    The case-insensitive sort order intentionally matches the historical
-    Bootdisk inventory behaviour. Keeping this stable avoids changing
-    manifest ordering merely because the implementation was refactored.
-    """
-    paths = sorted(
-        (path for path in root.rglob("*") if path.is_file()),
-        key=lambda path: path.relative_to(root).as_posix().lower(),
-    )
-
+    discover(root)
+    # Preserve legacy ordering, with an exact-path tie-break for case collisions.
+    paths.sort(key=lambda path: (
+        path.relative_to(root).as_posix().lower(),
+        path.relative_to(root).as_posix(),
+    ))
     for path in paths:
-        records.append(
-            FileRecord(
-                # Never preserve the machine-specific absolute path. The
-                # relative POSIX form gives us a portable source path.
-                path=path.relative_to(root).as_posix(),
-                size=path.stat().st_size,
-                sha256=sha256_file(path),
-            )
-        )
-
+        before = path.stat()
+        digest = sha256_file(path)
+        after = path.stat()
+        if (before.st_size, before.st_mtime_ns, before.st_ino) != (
+            after.st_size, after.st_mtime_ns, after.st_ino
+        ):
+            raise ValueError(f"Source changed while hashing: {path}")
+        records.append(FileRecord(path.relative_to(root).as_posix(), before.st_size, digest))
     return records
