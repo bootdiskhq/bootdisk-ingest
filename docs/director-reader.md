@@ -12,7 +12,8 @@ version 11, 144 main-channel bytes and 120 24-byte sprite channels. Unsupported
 variants raise `UnsupportedDirector`; corrupt structures raise `DirectorError`
 (a `ValueError`) with a resource-relative location where available.
 
-Both supplied K-CD 1/2000 originals were tested. Big-endian containers are
+The movie and Constant cast from both K-CD 1/2000 and K-CD 4/2000 were tested.
+The second source required no production-reader changes. Big-endian containers are
 covered with synthetic fixtures, not a second original source. This is deliberately
 narrow qualification, not a claim to support every Director 6 file.
 
@@ -132,7 +133,8 @@ delta inheritance, duplicate labels and malformed input handling.
 
 ## Remaining qualification
 
-Read another old K-CD without K.DTX before widening the profile. Extend deliberately
+K-CD 4/2000 now qualifies a second source in the same profile. Continue to test
+additional sources before widening the profile. Extend deliberately
 when new structural evidence warrants it. A complete adapter still needs active
 menu reachability, behaviors/dynamic script effects, language casts where relevant,
 editorial grouping, inventory resolution and conflict policy. This reader's
@@ -145,3 +147,51 @@ Format references consulted: ScummVM's
 and [score reader](https://github.com/scummvm/scummvm/blob/master/engines/director/score.cpp).
 Implementation is a small independent observational parser; no ScummVM code or
 runtime dependencies are bundled.
+
+
+## Second-source qualification: K-CD 4/2000
+
+The unchanged reader at main commit
+`28f778426d0c6c1e02760f930a3cd1842ea8d42e` decoded these files successfully:
+
+| Observation | K-CD 1/2000 | K-CD 4/2000 |
+|---|---:|---:|
+| Movie CASt members | 305 | 314 |
+| Movie Lscr resources | 88 | 94 |
+| Movie frames | 1163 | 1196 |
+| Labels | 624 | 651 |
+| Constant populated CASt members | 446 | 440 |
+| Constant declared member range | 1–447 | 1–451 |
+| Constant Lscr resources | 229 | 218 |
+
+Opt-in second-source regressions:
+
+```sh
+BOOTDISK_DIRECTOR_KCD4_FIXTURES=/path/to/K-CD-4-2000 \
+  python -m unittest discover -s tests -v
+```
+
+Set both fixture environment variables to test both sources together. Each points
+to a directory containing that source's `K-CN.dxr` and `Constant.cxt`; no full
+executable inventory is required for these binary-reader regressions. K-CD 4/2000
+SHA-256 values:
+
+- K-CN.dxr: `0ad0224bfeb9111bdd25e402a2feee8340ee8f84ba361e703a5d19ef111fe6e0`
+- Constant.cxt: `75f4595a062dc351bbc2ef57152202ed35fa3c9e16b8fbb32528e48afc193c56`
+
+The ten new tests capture changed game targets, an embedded Geometra install
+script, the Norwegian Word/index paths, and a shared Swedish Word script with
+the same member name as its Norwegian embedded counterpart. Score references,
+not member names, determine which bytes are associated with a page.
+
+The Albert Åberg direct install script references `AabergNo\Setup.exe`, but
+frame 357/channel 91 references absent Constant member 414. This remains unresolved;
+the reader does not invent a replacement. Runtime behavior is not established.
+The tests also retain NHL data in older shared scripts without applying it to the
+current PhotoLine page. Presence in a score or in a registered script remains
+insufficient to prove reachability or a current catalog entry.
+
+The mounted 4/2000 directory was independently inventoried during qualification:
+3739 files, 612257117 bytes, no `.dtx` file. Sixteen selected editorial launch
+mappings had file matches (some required case-insensitive lookup). This is a
+one-time inventory observation, not a new reader feature or an exhaustive adapter.
