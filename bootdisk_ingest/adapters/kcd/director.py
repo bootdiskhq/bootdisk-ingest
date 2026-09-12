@@ -477,6 +477,12 @@ def parse_director_disc(disc_root, disc_inventory, *, generated_at=None):
     if len(libraries) != 1:
         raise DirectorError("K-CD profile requires one declared Constant.cxt library")
     casts = {libraries[0].id: open_source("Constant.cxt")}
+    cast_paths = {libraries[0].id: sources[-1]["path"]}
+    for lib in movie.libraries():
+        basename = lib.path.replace(b"\\", b"/").split(b"/")[-1].lower()
+        if basename in (b"norsk.cst", b"norsk.cxt") and inventory.find("Norsk.cxt")[0]:
+            casts[lib.id] = open_source("Norsk.cxt")
+            cast_paths[lib.id] = sources[-1]["path"]
     projection = MenuProjection(movie, casts, inventory)
     entries = projection.entries()
     detached = []
@@ -515,7 +521,7 @@ def parse_director_disc(disc_root, disc_inventory, *, generated_at=None):
                     "name": raw_value(lib.name),
                     "declared_path": raw_value(lib.path),
                     "source_path": (
-                        sources[1]["path"]
+                        cast_paths[lib.id]
                         if lib.id in casts
                         else sources[0]["path"] if not lib.path else None
                     ),
@@ -528,7 +534,7 @@ def parse_director_disc(disc_root, disc_inventory, *, generated_at=None):
             "unselected_launch_scripts": detached,
             "limitations": [
                 "Static menu candidates, not runtime reachability or execution",
-                "Only the movie and declared Constant.cxt are linked",
+                "Movie, Constant.cxt and available declared Norsk.cxt are linked",
                 "Scope: games and KDisk program menus, not every disc section",
                 "Computed launch arguments and sprite behaviors are not evaluated",
                 "Chicken labels and game title channel are K-CD conventions",
