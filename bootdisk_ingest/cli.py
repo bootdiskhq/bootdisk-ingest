@@ -18,7 +18,7 @@ def parse_args(argv=None):
     parser.add_argument("--output", type=Path, default=Path("ingest-manifest.json"),
                         help="Manifest outside the source tree (default: ./ingest-manifest.json)")
     parser.add_argument("--force", action="store_true", help="Replace an existing output atomically")
-    parser.add_argument("--strict", action="store_true", help="Return 1 after writing if referenced files are missing")
+    parser.add_argument("--strict", action="store_true", help="Return 1 after writing if references are missing or Director launch evidence is unresolved/conflicting")
     parser.add_argument("--quiet", action="store_true", help="Suppress the human-readable report")
     parser.add_argument("--version", action="version", version=__version__)
     return parser.parse_args(argv)

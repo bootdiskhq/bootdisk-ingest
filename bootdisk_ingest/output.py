@@ -37,6 +37,9 @@ def print_report(
     manifest,
     output_file,
 ):
+    if manifest["source"]["format"] == "kcd-director-d6-v1":
+        print_director_report(manifest, output_file)
+        return
     entries = manifest["entries"]
     stats = manifest["statistics"]
     validation = manifest["validation"]
@@ -261,4 +264,27 @@ def print_report(
     )
 
     print()
+    print(f"Skrev {output_file}")
+
+
+def print_director_report(manifest, output_file):
+    print(f"\nBootdisk ingest v{__version__} — K-CD Director (eksperimentell)")
+    print(f"Fant {len(manifest['entries'])} program- og spillkandidater fra menyene")
+    issue_labels = {
+        "unresolved_direct_launch": "Direkte oppstart er uavklart",
+        "unresolved_warning_continue_launch": "Fortsett-knappen er uavklart",
+        "unresolved_direct_target": "Direkte filsti kan ikke avgjøres",
+        "unresolved_warning_continue_target": "Filsti fra fortsett-knappen kan ikke avgjøres",
+        "conflicting_launch_targets": "Knappene peker til forskjellige programfiler",
+        "missing_launch_file": "En referert programfil mangler",
+    }
+    for entry in manifest["entries"]:
+        title = " ".join(entry["normalized"]["title"].split())
+        print(f"  {entry['source_id']}: {title}")
+        for issue in entry["issues"]:
+            print(f"    Avvik: {issue_labels.get(issue, issue)}")
+    validation = manifest["validation"]
+    print(f"Manglende programfilreferanser: {len(validation['missing_referenced_files'])}")
+    print(f"Poster med uavklart eller motstridende kobling: {len(validation['entry_issues'])}")
+    print("Statisk analyse; programmene er ikke kjørt. Se JSON for kilder og begrensninger.")
     print(f"Skrev {output_file}")
