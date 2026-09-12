@@ -25,15 +25,26 @@ files or the supplied image. Use a stable, preferably read-only source snapshot.
 
 `--quiet` suppresses the historical human-readable report. `--strict` returns 1
 if explicit references are missing, after writing the observation manifest.
+For the experimental Director adapter it also returns 1 for unresolved or
+conflicting primary launch evidence.
 Exit 0 means the requested observation completed; exit 2 means input or output
 failure. Optional missing editorial assets do not invalidate a source.
-`validation.valid` only describes explicit file references, not source authenticity
+For DTX input, `validation.valid` only describes explicit file references, not source authenticity
 or completeness. Parser projection warnings are in `source.parser_warnings`.
 
 The image and source directory are independent inputs. The tool does not mount,
 extract, execute, or copy historical software, and does not prove that the directory
 came from the image. Preserve original files/images separately: a manifest is not
 an archive of their bytes. Exact K.DTX bytes are additionally embedded as base64.
+
+## K-CD without K.DTX
+
+When K.DTX is absent, the same command reads `K-CN.dxr` and `Constant.cxt`
+through the experimental Director adapter. It produces a separately versioned
+manifest with score-backed program/game candidates, both launch branches,
+source references, and explicit conflicts or unresolved mappings. K.DTX-based
+input retains its existing behavior. See the [adapter profile, limitations and
+Linux ISO test](docs/kcd-director-adapter.md).
 
 ## Reproducibility
 
