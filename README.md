@@ -98,3 +98,11 @@ Supplying the image additionally verifies image identity and filesystem metadata
 
 No software license has been selected in the baseline repository. This candidate
 does not invent a license or alter third-party media rights.
+
+## Experimental Director observations
+
+A read-only Director 6 format reader is available for research and adapter
+construction. It preserves structural references, raw bytes and conflicting
+script arguments. It does not yet ingest K-CD sources without K.DTX.
+See [the reader guide](docs/director-reader.md) for the API, observation command,
+qualified formats, optional original-media tests and current limitations.
