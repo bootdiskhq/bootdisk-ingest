@@ -117,3 +117,8 @@ construction. It preserves structural references, raw bytes and conflicting
 script arguments. It does not yet ingest K-CD sources without K.DTX.
 See [the reader guide](docs/director-reader.md) for the API, observation command,
 qualified formats, optional original-media tests and current limitations.
+
+## Extract observed files
+
+Use `--extract-to /path/to/new-directory` to copy explicit file references with
+per-entry metadata and SHA-256 verification. See [scope and usage](docs/extraction.md).

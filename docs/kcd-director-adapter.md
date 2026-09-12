@@ -9,8 +9,8 @@ Director manifests use **`kcd-director-experimental-1`** and source format
 The adapter requires root `K-CN.dxr` and `Constant.cxt`, matched using the core's
 exact-first, unambiguous case-insensitive inventory lookup. Constant is bound
 through its declared MCsL library ID and validated DRCF member bounds. Original
-authoring-drive paths are evidence only; they are never opened. The other
-external casts remain explicitly unresolved even if present on the disc.
+authoring-drive paths are evidence only; they are never opened. An available Norsk.cxt is also linked when the movie declares Norsk.cst or
+Norsk.cxt. Other external casts remain explicitly unresolved.
 
 This profile is qualified with K-CD **1/2000 and 4/2000**, Director 6 version
 0x04c7. Other discs may be rejected or need further qualification. There are no
@@ -138,3 +138,5 @@ python3 -m unittest discover -s tests -v
 ```
 
 No original media are distributed with the repository or patch.
+
+File copying is now available; see [first extraction](extraction.md).
