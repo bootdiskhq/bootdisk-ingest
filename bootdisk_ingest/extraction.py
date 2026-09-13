@@ -1,4 +1,4 @@
-"""Copy explicit observed inventory references; never infer packages or execute files."""
+"""Copy explicit observed file references; never infer packages or execute files."""
 
 import json
 import hashlib
@@ -13,6 +13,35 @@ def safe_relative(value):
     if path.is_absolute() or any(x in ("", ".", "..") for x in value.split("/")):
         raise ValueError("Extraction reference must be relative without traversal")
     return path
+
+
+def _explicit_file_references(entry):
+    """Return every file path that the manifest explicitly associates with an entry.
+
+    ``inventory_refs`` remains the preservation package view used by existing
+    adapters. ``files.discovered`` may additionally identify exact observed
+    assets such as screenshots and icons. Extraction must preserve both sets so
+    downstream consumers can materialize manifest-declared assets without ever
+    returning to the original source medium.
+
+    This intentionally does not scan directories or infer neighboring files.
+    """
+
+    files = entry.get("files", {})
+    refs = set(files.get("inventory_refs", []))
+    discovered = files.get("discovered", {})
+    if isinstance(discovered, dict):
+        for observation in discovered.values():
+            if not isinstance(observation, dict):
+                continue
+            if observation.get("exists") is not True:
+                continue
+            if observation.get("is_file") is not True:
+                continue
+            path = observation.get("path")
+            if isinstance(path, str) and path:
+                refs.add(path)
+    return sorted(refs)
 
 
 def extract_entries(root, manifest, destination):
@@ -30,7 +59,7 @@ def extract_entries(root, manifest, destination):
     planned = []
     for index, entry in enumerate(manifest["entries"], 1):
         refs = []
-        for ref in sorted(set(entry["files"]["inventory_refs"])):
+        for ref in _explicit_file_references(entry):
             path = safe_relative(ref)
             if ref not in records:
                 raise ValueError(f"Extraction reference absent from inventory: {ref}")
@@ -43,7 +72,7 @@ def extract_entries(root, manifest, destination):
     try:
         summary = {
             "schema_version": "bootdisk-extraction-1",
-            "scope": "Explicit inventory references; not a complete software-package claim",
+            "scope": "Explicit manifest file references; not a complete software-package claim",
             "disc": manifest["disc"],
             "source": manifest["source"],
             "entries": [],
