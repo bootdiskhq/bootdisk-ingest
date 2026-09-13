@@ -72,6 +72,44 @@ class ExtractionTests(unittest.TestCase):
             {"Setup.exe", "Shot.jpg"},
         )
 
+    def test_discovered_asset_reads_resolved_path_but_preserves_manifest_path(self):
+        actual = self.root / "Tools" / "CPUZ" / "Shot.jpg"
+        actual.parent.mkdir(parents=True)
+        actual.write_bytes(b"case mismatch screenshot")
+        digest = hashlib.sha256(actual.read_bytes()).hexdigest()
+        self.manifest["file_inventory"].append(
+            {
+                "path": "Tools/CPUZ/Shot.jpg",
+                "size": actual.stat().st_size,
+                "sha256": digest,
+            }
+        )
+        self.manifest["entries"][0]["files"]["discovered"] = {
+            "screenshot": {
+                "exists": True,
+                "is_file": True,
+                "path": "Tools/cpuz/Shot.jpg",
+                "resolved_path": "Tools/CPUZ/Shot.jpg",
+                "path_case_mismatch": True,
+                "size": actual.stat().st_size,
+                "sha256": digest,
+            }
+        }
+
+        result = extract_entries(self.root, self.manifest, self.dest)
+
+        extracted = self.dest / "0001/files/Tools/cpuz/Shot.jpg"
+        self.assertEqual(extracted.read_bytes(), actual.read_bytes())
+        copied = result["entries"][0]["copied_files"]
+        self.assertIn(
+            {
+                "path": "Tools/cpuz/Shot.jpg",
+                "size": actual.stat().st_size,
+                "sha256": digest,
+            },
+            copied,
+        )
+
     def test_discovered_nonfile_is_not_promoted_to_extraction_reference(self):
         self.manifest["entries"][0]["files"]["discovered"] = {
             "folder": {
