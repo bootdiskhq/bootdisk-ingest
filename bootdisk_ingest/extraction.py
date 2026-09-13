@@ -16,19 +16,24 @@ def safe_relative(value):
 
 
 def _explicit_file_references(entry):
-    """Return every file path that the manifest explicitly associates with an entry.
+    """Return manifest paths paired with the observed source paths to read.
 
-    ``inventory_refs`` remains the preservation package view used by existing
-    adapters. ``files.discovered`` may additionally identify exact observed
-    assets such as screenshots and icons. Extraction must preserve both sets so
-    downstream consumers can materialize manifest-declared assets without ever
-    returning to the original source medium.
+    ``inventory_refs`` already use observed inventory paths. ``files.discovered``
+    deliberately preserves the source metadata spelling in ``path`` and records
+    a different ``resolved_path`` when case-insensitive lookup was required.
 
-    This intentionally does not scan directories or infer neighboring files.
+    Extraction keeps the manifest path as its public identity while reading the
+    bytes from the resolved observed path. That makes the manifest-to-extraction
+    contract stable without silently rewriting source evidence.
     """
 
     files = entry.get("files", {})
-    refs = set(files.get("inventory_refs", []))
+    refs = {
+        path: path
+        for path in files.get("inventory_refs", [])
+        if isinstance(path, str) and path
+    }
+
     discovered = files.get("discovered", {})
     if isinstance(discovered, dict):
         for observation in discovered.values():
@@ -38,10 +43,13 @@ def _explicit_file_references(entry):
                 continue
             if observation.get("is_file") is not True:
                 continue
-            path = observation.get("path")
-            if isinstance(path, str) and path:
-                refs.add(path)
-    return sorted(refs)
+            manifest_path = observation.get("path")
+            if not isinstance(manifest_path, str) or not manifest_path:
+                continue
+            source_path = observation.get("resolved_path", manifest_path)
+            refs[manifest_path] = source_path
+
+    return sorted(refs.items())
 
 
 def extract_entries(root, manifest, destination):
@@ -55,19 +63,42 @@ def extract_entries(root, manifest, destination):
     resolved = destination.resolve()
     if resolved.is_relative_to(root) or root.is_relative_to(resolved):
         raise ValueError("Extraction destination must be separate from the source tree")
+
     records = {r["path"]: r for r in manifest["file_inventory"]}
+    casefold_records = {}
+    for record in manifest["file_inventory"]:
+        casefold_records.setdefault(record["path"].casefold(), record)
+
     planned = []
     for index, entry in enumerate(manifest["entries"], 1):
         refs = []
-        for ref in _explicit_file_references(entry):
-            path = safe_relative(ref)
-            if ref not in records:
-                raise ValueError(f"Extraction reference absent from inventory: {ref}")
-            source = root.joinpath(*path.parts)
+        for manifest_ref, source_ref in _explicit_file_references(entry):
+            target_path = safe_relative(manifest_ref)
+            observed_path = safe_relative(source_ref)
+
+            record = records.get(source_ref)
+            if record is None:
+                record = casefold_records.get(source_ref.casefold())
+            if record is None:
+                raise ValueError(f"Extraction reference absent from inventory: {manifest_ref}")
+
+            # Read from the exact path preserved by the inventory, even when the
+            # manifest reference differs only by case.
+            source_path = safe_relative(record["path"])
+            source = root.joinpath(*source_path.parts)
             if source.resolve() != source or not source.is_file():
-                raise ValueError(f"Extraction source missing or symbolic link: {ref}")
-            refs.append((ref, source, records[ref]))
+                raise ValueError(f"Extraction source missing or symbolic link: {record['path']}")
+
+            # copied_files must use the manifest identity, because downstream
+            # publication resolves assets by the manifest-declared path.
+            copied_record = {
+                "path": manifest_ref,
+                "size": record["size"],
+                "sha256": record["sha256"],
+            }
+            refs.append((target_path, source, copied_record))
         planned.append((f"{index:04d}", entry, refs))
+
     destination.mkdir()  # Exclusive: --force never authorizes overwriting an extraction.
     try:
         summary = {
@@ -81,8 +112,8 @@ def extract_entries(root, manifest, destination):
             folder = destination / directory
             folder.mkdir()
             copied = []
-            for ref, source, record in refs:
-                target = folder / "files" / ref
+            for target_path, source, record in refs:
+                target = folder / "files" / target_path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 digest, size = hashlib.sha256(), 0
                 with source.open("rb") as src, target.open("xb") as dst:
@@ -91,7 +122,7 @@ def extract_entries(root, manifest, destination):
                         digest.update(block)
                         size += len(block)
                 if size != record["size"] or digest.hexdigest() != record["sha256"]:
-                    raise ValueError(f"Source changed since inventory: {ref}")
+                    raise ValueError(f"Source changed since inventory: {record['path']}")
                 copied.append(record)
             (folder / "entry.json").write_text(
                 json.dumps(entry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
