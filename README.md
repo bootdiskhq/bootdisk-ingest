@@ -121,13 +121,18 @@ Supplying the image additionally verifies image identity and filesystem metadata
 
 - [Architecture](docs/architecture.md)
 - [Manifest compatibility and identities](docs/manifest-contract.md)
-- [ADR-0004: Preservation, provenance and catalog](docs/adr/ADR-0004-domain-separation.md)
-- [ADR-0005: Source adapters](docs/adr/ADR-0005-source-adapters.md)
+- [ADR index and ownership](docs/adr/README.md)
+- [Project ADR-0004: Preservation, provenance and catalog](https://github.com/bootdiskhq/bootdisk/blob/main/docs/adr/0004-separate-preservation.md)
+- [Project ADR-0005: Source adapters](https://github.com/bootdiskhq/bootdisk/blob/main/docs/adr/0005-Source-adapters-isolate-source-specific-parsing-from-the-preservation-core.md)
 - [ADR-0006: Evidence and safe manifest writing](docs/adr/ADR-0006-evidence-and-publication.md)
 - [ADR-0007: Director structure as a format layer](docs/adr/ADR-0007-director-format-observations.md)
 - [ADR-0008: Manifest is the publication contract](docs/adr/ADR-0008-manifest-publication-contract.md)
 - [Candidate review and remaining limits](docs/release-candidate.md)
 - [Historical README](docs/v0.9-readme.md)
+
+The local copies of ADR-0004 and ADR-0005 are retained as historical mirrors from
+before ADR ownership was formalized. The project-level records linked above are
+authoritative.
 
 No software license has been selected in the baseline repository. This candidate
 does not invent a license or alter third-party media rights.
