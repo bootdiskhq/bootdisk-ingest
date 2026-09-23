@@ -149,3 +149,11 @@ script arguments. K-CD ingest uses the K-CD Director adapter when K.DTX is absen
 the generic format reader itself does not choose source policy or infer K-CD
 semantics. See [the reader guide](docs/director-reader.md) for the API, observation
 command, qualified formats, optional original-media tests and current limitations.
+
+## DTX image conventions
+
+Screenshot discovery prefers `Shot.jpg` and falls back to `Shot.bmp` only
+when JPG is absent. Case-insensitive resolution retains the observed source
+path and hash. If neither exists, the missing asset remains explicit. This
+recovers 17 screenshots on K-CD 8/2001 and 32 on K-CD 1/2001; absent images
+are not invented.

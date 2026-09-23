@@ -133,6 +133,18 @@ class ExtractionTests(unittest.TestCase):
             extract_entries(self.root, self.manifest, self.dest)
         self.assertTrue((self.dest / "keep").exists())
 
+    def test_inventory_and_discovered_case_alias_keep_both_references(self):
+        self.manifest["entries"][0]["files"]["discovered"] = {
+            "installer": {"exists": True, "is_file": True,
+                          "path": "setup.exe", "resolved_path": "Setup.exe"}
+        }
+        result = extract_entries(self.root, self.manifest, self.dest)
+        copied = result["entries"][0]["copied_files"]
+        self.assertEqual({r["path"] for r in copied}, {"Setup.exe", "setup.exe"})
+        for record in copied:
+            data=(self.dest / "0001/files" / record["path"]).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"])
+
     def test_changed_bytes_fail_and_remove_partial_export(self):
         (self.root / "Setup.exe").write_bytes(b"changed")
         with self.assertRaisesRegex(ValueError, "changed"):

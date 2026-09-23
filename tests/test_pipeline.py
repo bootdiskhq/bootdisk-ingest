@@ -55,6 +55,22 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(forced.returncode, 0, forced.stderr)
         self.assertEqual(self.output.read_bytes(), before)
 
+    def test_screenshot_bmp_fallback_preserves_observed_case_and_bytes(self):
+        image = self.root / "App/SHOT.BMP"
+        image.write_bytes(b"source bitmap")
+        result = ingest_kcd(self.root)
+        observed = result["entries"][0]["files"]["discovered"]["screenshot"]
+        self.assertTrue(observed["exists"])
+        self.assertEqual(observed["path"], "App/Shot.bmp")
+        self.assertEqual(observed["resolved_path"], "App/SHOT.BMP")
+        self.assertEqual(observed["sha256"], hashlib.sha256(image.read_bytes()).hexdigest())
+
+    def test_screenshot_jpg_remains_preferred_when_both_exist(self):
+        (self.root / "App/Shot.jpg").write_bytes(b"original preferred image")
+        (self.root / "App/Shot.bmp").write_bytes(b"alternative image")
+        result = ingest_kcd(self.root)
+        self.assertEqual(result["entries"][0]["files"]["discovered"]["screenshot"]["path"], "App/Shot.jpg")
+
     def test_strict_reports_missing_reference_after_writing(self):
         (self.root / "App/setup.exe").unlink()
         result = self.cli("--strict")

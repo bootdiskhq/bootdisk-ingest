@@ -40,6 +40,20 @@ class ImageSelectionTests(unittest.TestCase):
         selected,issues=select_images(entry,[frame],NS(resolve=lambda s:s.link))
         self.assertEqual(selected,[]);self.assertIn('missing_or_ambiguous_detail_image',issues)
 
+    def test_cropped_icons_exclude_menu_decoration_and_keep_ambiguity(self):
+        title=sprite(8,1,1,84);title.link.cast.kind=12
+        decoration=sprite(3,38,38,100)
+        entry={'evidence':{'selection':{'frame':1,'channel':8,'method':'clickable menu text'},'frame_action':{'frame':2}}}
+        for w,h in [(26,32),(30,31),(32,31),(30,30)]:
+            icon=sprite(24,w,h,107)
+            frames=[NS(number=1,sprites=[title,decoration,icon]),NS(number=2,sprites=[sprite(9,195,145)])]
+            selected,issues=select_images(entry,frames,NS(resolve=lambda s:s.link))
+            self.assertEqual(issues,[]);self.assertIs(selected[1][2],icon)
+            frames[0].sprites.append(sprite(25,32,32,108))
+            selected,issues=select_images(entry,frames,NS(resolve=lambda s:s.link))
+            self.assertEqual([s[0] for s in selected],['screenshot'])
+            self.assertIn('missing_or_ambiguous_menu_icon',issues)
+
     @unittest.skipUnless(os.environ.get('BOOTDISK_IMAGE_MANIFEST') and os.environ.get('BOOTDISK_DIRECTOR_FIXTURES'),'image media and manifest unavailable')
     def test_real_disc_has_21_images_and_18_icons_and_rejects_changed_binding(self):
         source=os.environ['BOOTDISK_DIRECTOR_FIXTURES'];manifest=Path(os.environ['BOOTDISK_IMAGE_MANIFEST'])

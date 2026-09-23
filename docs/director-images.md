@@ -6,7 +6,7 @@ original ingest manifest; it does not replace that manifest or alter its identit
 
 The K-CD D6 profile rechecks the selected source frames against verified source
 archives. It selects a unique 195×145 bitmap on each detail frame and a unique
-32×32 bitmap whose score position is inside the clickable title row on program
+16–32 pixel bitmap whose score position is inside the clickable title row on program
 menus. Ambiguity is an explicit outcome, never a first-match choice. Game pages
 currently have no qualified icon selector; their screenshots can be used as
 presentation thumbnails, not relabelled as original icons.
@@ -32,3 +32,13 @@ Laid Back uses a Winamp icon, and Excel Viewer uses the same icon as Word eksemp
 on the original menu. Preserve those source observations; do not silently replace
 them with more plausible modern images. Launch-target conflicts do not remove a
 separate, verified menu-image association.
+
+## Five-disc qualification (September 2026)
+
+Selection method `kcd-d6-score-images-2` accepts cropped menu icons between
+16 and 32 pixels on both axes. K-CD 4/2000, 9/2000 and 13/2000 contain
+26×32, 30×31, 32×31 and 30×30 icons. The separate 38×38 menu-button
+decoration remains excluded; multiple eligible icons in a title row still
+produce an explicit ambiguity. Results: 4/2000 has 16 images and 13 icons;
+9/2000 has 20 images and 17 icons; 13/2000 has 16 images and 13 icons.
+The three game entries on each disc use image thumbnails in the frontend.
