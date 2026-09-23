@@ -41,3 +41,10 @@ its separate NeoTrace warning-continue path.
 
 Optional 9/2000 regression: set `BOOTDISK_DIRECTOR_KCD9_FIXTURES` to a directory
 containing the three original files, then run the standard unittest discovery.
+
+On case-insensitive destination filesystems, an inventory spelling and a
+discovered spelling may resolve to the same output file. Extraction reuses
+only a file already copied and verified from that same observed source in
+the current entry. Both manifest spellings remain in `copied_files`. Different
+source files are never silently merged. This is exercised by K-CD 8/2001's
+`ModemBoost` / `Modemboost` references.

@@ -112,10 +112,21 @@ def extract_entries(root, manifest, destination):
             folder = destination / directory
             folder.mkdir()
             copied = []
+            created = []
             for target_path, source, record in refs:
                 target = folder / "files" / target_path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 digest, size = hashlib.sha256(), 0
+                # A discovered spelling and an inventory spelling may alias on
+                # case-insensitive filesystems. Reuse only our own verified copy
+                # of this exact source; retain both manifest paths in metadata.
+                alias = target.exists() and any(
+                    previous_source == source and target.samefile(previous_target)
+                    for previous_source, previous_target in created
+                )
+                if alias:
+                    copied.append(record)
+                    continue
                 with source.open("rb") as src, target.open("xb") as dst:
                     while block := src.read(1024 * 1024):
                         dst.write(block)
@@ -124,6 +135,7 @@ def extract_entries(root, manifest, destination):
                 if size != record["size"] or digest.hexdigest() != record["sha256"]:
                     raise ValueError(f"Source changed since inventory: {record['path']}")
                 copied.append(record)
+                created.append((source, target))
             (folder / "entry.json").write_text(
                 json.dumps(entry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
             )

@@ -132,6 +132,13 @@ def build_entry(
             filename,
         )
 
+        # Earlier DTX discs also use Shot.bmp. Preserve the established JPG
+        # convention when both exist; only fall back when JPG is absent.
+        if asset_type == "screenshot" and not get_file_record(disc_inventory, asset_path).get("exists"):
+            bitmap_path = relative_disc_path(folder, "Shot.bmp")
+            if get_file_record(disc_inventory, bitmap_path).get("is_file"):
+                asset_path = bitmap_path
+
         discovered_assets[asset_type] = (
             get_file_record(
                 disc_inventory,

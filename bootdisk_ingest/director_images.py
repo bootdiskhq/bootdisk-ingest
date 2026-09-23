@@ -13,7 +13,7 @@ from .formats.director import Archive, DirectorError
 from .formats.director.binary import View
 
 SCHEMA = 'bootdisk-embedded-images-1'
-METHOD = 'kcd-d6-score-images-1'
+METHOD = 'kcd-d6-score-images-2'
 
 
 def bitmap_layout(data):
@@ -30,7 +30,11 @@ def bitmap_layout(data):
 
 
 def select_images(entry, frames, links):
-    """Qualified K-CD layout: unique 195x145 detail and 32x32 title-row icon."""
+    """Qualified K-CD layout: unique detail and 16–32px title-row icon.
+
+    Original casts crop unused icon borders (e.g. 26x32 or 32x31).
+    The 38x38 menu button decoration is deliberately outside this range.
+    """
     def bitmaps(frame):
         for sprite in frame.sprites:
             link = links.resolve(sprite)
@@ -52,10 +56,10 @@ def select_images(entry, frames, links):
         title = next(s for s in overview.sprites if s.channel == entry['evidence']['selection']['channel'])
         t = View(title.raw, 'title sprite')
         top, height = t.i16(12), t.u16(16)
-        icons = [(s,l,d) for s,l,d in bitmaps(overview) if (d['width'],d['height']) == (32,32)
+        icons = [(s,l,d) for s,l,d in bitmaps(overview) if 16 <= d['width'] <= 32 and 16 <= d['height'] <= 32
                  and top <= View(s.raw,'icon sprite').i16(12) < top+height]
         if len(icons) == 1:
-            selected.append(('icon', overview, *icons[0], 'unique 32x32 bitmap in clickable title row'))
+            selected.append(('icon', overview, *icons[0], 'unique 16–32px bitmap in clickable title row'))
         else:
             issues.append('missing_or_ambiguous_menu_icon')
     else:
