@@ -15,6 +15,7 @@ from bootdisk_ingest.config import (
 )
 from .config import KNOWN_ASSETS, KNOWN_NON_CATEGORY_FIELDS, SOURCE_FORMAT
 from bootdisk_ingest.core.identity import build_content_identity
+from bootdisk_ingest.formats.rtf import plain_text, METHOD as RTF_METHOD
 from bootdisk_ingest.inventory import (
     get_file_record,
     get_folder_records,
@@ -300,6 +301,32 @@ def parse_disc(
                     config[section_name],
                 )
             )
+
+    for entry in entries:
+        if (entry.get("raw", {}).get("Global") or "").strip():
+            continue
+        rtf = entry["files"]["discovered"].get("description_rtf", {})
+        if not rtf.get("is_file"):
+            continue
+        relative = rtf.get("resolved_path", rtf["path"])
+        path = (disc_root / relative).resolve()
+        if not path.is_relative_to(disc_root.resolve()):
+            raise ValueError("RTF source escapes media")
+        if rtf["size"] > 1024 * 1024:
+            warnings.append(f"{entry['source_id']}: RTF description exceeds observation limit")
+            continue
+        data = path.read_bytes()
+        if len(data) != rtf["size"] or hashlib.sha256(data).hexdigest() != rtf["sha256"]:
+            raise ValueError("RTF changed after inventory")
+        observation = {"path": relative, "sha256": rtf["sha256"], "size": len(data),
+                       "raw_base64": base64.b64encode(data).decode("ascii"), "method": RTF_METHOD}
+        try:
+            observation["text"] = plain_text(data)
+        except (ValueError, UnicodeError) as exc:
+            observation["text"] = None
+            observation["warning"] = str(exc)
+            warnings.append(f"{entry['source_id']}: RTF description not decoded: {exc}")
+        entry.setdefault("evidence", {})["description_rtf"] = observation
 
     source = build_source_metadata(disc_inventory)
     source["dtx_file"]["raw_base64"] = base64.b64encode(raw_bytes).decode("ascii")
