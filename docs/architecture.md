@@ -18,6 +18,8 @@ should not inherit publication or catalog semantics.
 | `core/identity.py` | Artifact identifiers and stable collection digest |
 | `core/models.py`, `core/provenance.py` | Independent entities and occurrence links |
 | `formats/director/` | Checked, read-only Director structure and byte observations |
+| `formats/pe_version.py` | Bounded PE VERSIONINFO byte observations, without execution |
+| `inspection.py` | Hash-verified file/text observations and versioned decoding cache; no semantic approval |
 | `adapters/kcd/` | K.DTX, CP1252, K-CD editorial semantics, Director projection and path conventions |
 | `media.py`, `iso9660.py` | Image identity and bounded filesystem observations |
 | `pipeline.py` | Explicit K-CD application workflow and parser selection |

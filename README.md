@@ -1,5 +1,9 @@
 # Bootdisk ingest 1.0.0rc1
 
+After ingestion, [read-only file inspection](docs/file-inspection.md) can collect
+PE version metadata and readable text excerpts as evidence for candidate curation.
+It never executes installers or automatically approves software identity/version.
+
 Bootdisk observes historical software sources and records byte identities,
 original metadata and provenance. **Parser observes more than it interprets.**
 K-CD is the first source adapter; it is not the Bootdisk data model.
