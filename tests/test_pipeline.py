@@ -71,6 +71,27 @@ class PipelineTests(unittest.TestCase):
         result = ingest_kcd(self.root)
         self.assertEqual(result["entries"][0]["files"]["discovered"]["screenshot"]["path"], "App/Shot.jpg")
 
+    def test_rtf_description_observation_keeps_original_bytes_and_global_priority(self):
+        import base64
+        data=br"{\rtf1\ansi Norsk bl\'e5 tekst\par }"
+        (self.root / "App/No.rtf").write_bytes(data)
+        result=ingest_kcd(self.root)
+        observation=result["entries"][0]["evidence"]["description_rtf"]
+        self.assertEqual(base64.b64decode(observation["raw_base64"]), data)
+        self.assertEqual(observation["sha256"], hashlib.sha256(data).hexdigest())
+        self.assertEqual(observation["text"], "Norsk blå tekst\n")
+        with (self.root / "K.DTX").open('ab') as f: f.write(b"Global=Original summary\n")
+        result=ingest_kcd(self.root)
+        self.assertNotIn('description_rtf', result['entries'][0].get('evidence', {}))
+
+    def test_unsupported_rtf_remains_explicit_without_invented_text(self):
+        (self.root / "App/No.rtf").write_bytes(br"{\rtf1\ansicpg932 text}")
+        result=ingest_kcd(self.root)
+        observation=result['entries'][0]['evidence']['description_rtf']
+        self.assertIsNone(observation['text'])
+        self.assertTrue(observation['raw_base64'])
+        self.assertIn('code page', result['source']['parser_warnings'][0])
+
     def test_strict_reports_missing_reference_after_writing(self):
         (self.root / "App/setup.exe").unlink()
         result = self.cli("--strict")
