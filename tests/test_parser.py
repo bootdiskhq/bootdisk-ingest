@@ -38,7 +38,10 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(base64.b64decode(m["source"]["dtx_file"]["raw_base64"]), raw)
         self.assertEqual(m["entries"][0]["raw"]["Titel"], "Last")
         self.assertIn("Unknown", m["source"]["sections"])
-        self.assertEqual(len(m["source"]["parser_warnings"]), 2)
+        self.assertEqual(len(m["source"]["parser_warnings"]), 3)
+        self.assertTrue(any("Undefined CP1252" in w for w in m["source"]["parser_warnings"]))
+        self.assertTrue(any("Duplicate INI" in w for w in m["source"]["parser_warnings"]))
+        self.assertIn("K.DTX: unprojected section Unknown", m["source"]["parser_warnings"])
 
     def test_lowercase_metadata_resolution(self):
         m = self.parse(b"[Generelt]\nX=y\n", metadata_name="k.dtx")

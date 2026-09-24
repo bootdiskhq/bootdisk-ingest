@@ -328,6 +328,14 @@ def parse_disc(
             warnings.append(f"{entry['source_id']}: RTF description not decoded: {exc}")
         entry.setdefault("evidence", {})["description_rtf"] = observation
 
+    # Append supplementary source entries after the unchanged K.DTX projection.
+    from .tools import parse_tools, metadata_coverage
+    primary_ids = [entry["source_id"] for entry in entries]
+    tool_entries, tools_source = parse_tools(disc_root, disc_inventory)
+    if set(primary_ids) & {entry["source_id"] for entry in tool_entries}:
+        raise ValueError("Duplicate source IDs across DTX metadata files")
+    entries.extend(tool_entries)
+
     source = build_source_metadata(disc_inventory)
     source["dtx_file"]["raw_base64"] = base64.b64encode(raw_bytes).decode("ascii")
     if metadata.get("resolved_path"):
@@ -335,6 +343,16 @@ def parse_disc(
     source["parser_warnings"] = warnings
     source["sections"] = {name: dict(config[name]) for name in config.sections()}
     source["defaults"] = dict(config.defaults())
+    source["supplemental_metadata"] = [tools_source] if tools_source else []
+    source["coverage"] = metadata_coverage(disc_inventory, config.sections(), primary_ids, tools_source, entries)
+    if tools_source:
+        warnings.extend("Tools.dtx: " + warning for warning in tools_source["parser_warnings"])
+    coverage = source["coverage"]
+    warnings.extend("Unprocessed DTX metadata: " + path for path in coverage["unprocessed_metadata"])
+    for metadata_file in coverage["metadata_files"]:
+        warnings.extend(metadata_file["path"] + ": unprojected section " + section
+                        for section in metadata_file["unprojected_sections"])
+
     return {
         "schema_version": SCHEMA_VERSION,
         "generator": {

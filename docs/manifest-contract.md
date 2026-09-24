@@ -71,3 +71,11 @@ The original image remains the authoritative evidence for unparsed fields.
 
 The unchanged reference manifest also records ISO9660 volume `K_CD_15_2001`,
 308681 blocks of 2048 bytes, Joliet level 3, and volume name `K-CD 15 2001`.
+
+## Supplementary Tools.dtx and coverage (2026-09-24)
+
+The frozen 39-entry reference above describes K.DTX only, not complete CD content.
+Current reads additionally project Tools.dtx I-sections. The existing K source
+fields and K entries stay unchanged. New source.supplemental_metadata, source.coverage
+and entry.evidence.description_tools fields are documented in [Tools.dtx](tools-dtx.md).
+Unknown DTX files/sections are reported; no complete-disc certification is implied.

@@ -264,6 +264,13 @@ def print_report(
     )
 
     print()
+    coverage = manifest.get("source", {}).get("coverage")
+    if coverage:
+        print("Metadatadekning (ikke bekreftelse på komplett CD):")
+        for item in coverage["metadata_files"]:
+            print(f"  {item['path']}: {len(item['projected_entry_ids'])} poster; {len(item['unprojected_sections'])} ubehandlede seksjoner")
+        for path in coverage["unprocessed_metadata"]:
+            print(f"  Ubehandlet metadata: {path}")
     print(f"Skrev {output_file}")
 
 
