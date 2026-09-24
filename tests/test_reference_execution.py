@@ -39,8 +39,24 @@ class RealMediaTests(unittest.TestCase):
     def test_ingest_reference_media(self):
         expected = json.loads(BASELINE.read_text(encoding="utf-8"))
         result = ingest_kcd(os.environ["BOOTDISK_KCD_ROOT"], image=os.environ.get("BOOTDISK_KCD_IMAGE"))
-        for key in ("entries", "file_inventory", "statistics", "validation"):
-            self.assertEqual(result[key], expected[key])
+        # The frozen 39-entry fixture covers K.DTX only. Keep those exact checks,
+        # then independently require the newly observed Tools catalogue.
+        primary = [e for e in result["entries"] if e["source_id"].startswith("K")]
+        self.assertEqual(primary, expected["entries"])
+        self.assertEqual(result["file_inventory"], expected["file_inventory"])
+        self.assertEqual(build_statistics(primary, {"files": result["file_inventory"]}), expected["statistics"])
+        self.assertEqual(build_validation(primary), expected["validation"])
+        tools = [e for e in result["entries"] if e["source_id"].startswith("I")]
+        self.assertEqual(len(result["entries"]), 68)
+        self.assertEqual(len(tools), 29)
+        self.assertTrue(all(e["evidence"]["description_tools"]["text"] for e in tools))
+        self.assertTrue(all(e["files"]["discovered"]["screenshot"]["exists"] for e in tools))
+        self.assertTrue(all(e["files"]["referenced"]["installer"]["exists"] for e in tools))
+        self.assertEqual(result["source"]["supplemental_metadata"][0]["sha256"],
+                         "05049722c88b4851949bc9431496ea959793f948b9f89605a13174da5b9c4409")
+        self.assertIn({"folder": "tools/cpuz", "entry_ids": ["K23", "I2"],
+                       "meaning": "shared folder, not an identity decision"},
+                      result["source"]["coverage"]["shared_entry_folders"])
         self.assertEqual(result["disc"]["content_identity"], expected["disc"]["content_identity"])
         self.assertEqual(result["source"]["dtx_file"]["sha256"], expected["source"]["dtx_file"]["sha256"])
         if os.environ.get("BOOTDISK_KCD_IMAGE"):
