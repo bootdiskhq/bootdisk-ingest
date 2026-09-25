@@ -15,7 +15,9 @@ TOKEN = re.compile(r"\\([a-zA-Z]+)(-?\d+)? ?|\\'([0-9a-fA-F]{2})|\\([^\r\n])|([{
 def plain_text(raw):
     if len(raw) > 1024 * 1024 or not raw.startswith(b"{\\rtf1"):
         raise ValueError("unsupported RTF header or size")
-    text = raw.decode("latin1")
+    # Some CD writers terminate the complete RTF stream with a NUL byte.
+    # Preserve bytes in evidence; accept only one terminal NUL, never body NULs.
+    text = (raw[:-1] if raw.endswith(b"\x00") else raw).decode("latin1")
     stack, output, fonts = [], [], {}
     state = {"skip": False, "hidden": False, "destination": None, "font": 0, "uc": 1}
     fallback, default_font, end = 0, 0, 0
