@@ -157,3 +157,7 @@ when JPG is absent. Case-insensitive resolution retains the observed source
 path and hash. If neither exists, the missing asset remains explicit. This
 recovers 17 screenshots on K-CD 8/2001 and 32 on K-CD 1/2001; absent images
 are not invented.
+
+## Additional workshop shelves
+
+For the six qualified 2000–2001 CDs whose tools are in Director shelves rather than Tools.dtx, also run the [additive workshop stage](docs/legacy-workshop.md). A successful main-menu ingest alone is not whole-disc completeness.
