@@ -18,6 +18,8 @@ def plain_text(raw):
     # Some CD writers terminate the complete RTF stream with a NUL byte.
     # Preserve bytes in evidence; accept only one terminal NUL, never body NULs.
     text = (raw[:-1] if raw.endswith(b"\x00") else raw).decode("latin1")
+    if "\x00" in text:
+        raise ValueError("NUL inside RTF stream")
     stack, output, fonts = [], [], {}
     state = {"skip": False, "hidden": False, "destination": None, "font": 0, "uc": 1}
     fallback, default_font, end = 0, 0, 0

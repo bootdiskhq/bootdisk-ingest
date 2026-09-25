@@ -19,6 +19,7 @@ class RtfTests(unittest.TestCase):
     def test_terminal_nul_is_not_body_text(self):
         self.assertEqual(plain_text(b"{\\rtf1 Original}\r\n\x00"), "Original")
         with self.assertRaises(ValueError): plain_text(b"{\\rtf1 Original}\x00suffix")
+        with self.assertRaises(ValueError): plain_text(b"{\\rtf1 Origi\x00nal}")
 
     def test_fields_show_result_without_executing_instruction(self):
         raw=br'{\rtf1{\field{\*\fldinst INCLUDETEXT "some-file"}{\fldrslt Original text}}}'
