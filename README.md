@@ -195,3 +195,24 @@ Milage. Original detail headings remain unchanged. The separate menu title
 software version. Additional warning controls include a stale FontPage/VBRun60.EXE
 reference absent from this disc; this is an explicit source issue, not a fourth
 program. Set `BOOTDISK_FEATURE_KCD9_INVENTORY` for five mounted-media checks.
+
+### Remaining Norwegian menu sections
+
+`python -m bootdisk_ingest.menu_sections SOURCE INVENTORY --medium kcd-13-2000 --output NEW_MANIFEST --images NEW_IMAGES`
+Supports 1, 4, 9 and 13/2000: five archive programs, one classic and five guides per
+disc. Norwegian score-bound text and literal primary controls are required.
+Guides bind baOpenFile PDFs, not Acrobat fallback installers. Drive prefixes and
+control bytes are not repaired. MarbleJongg's malformed direct call and valid
+warning continuation are retained separately. Artwork is section illustration.
+Runtime behavior and whole-disc completeness are not asserted.
+
+Feature sections also support `--medium kcd-13-2000`: Nerf ArenaBlast, Adastra and
+Audio Notes Recorder. The stale auxiliary FontPage control remains explicit.
+
+`python -m bootdisk_ingest.special_section SOURCE MANIFEST --output NEW_MANIFEST --extraction NEW_EXTRACTION`
+preserves K-CD 15/2001's explicit Generelt.Speciel/SpecielTekst and source images.
+K.EXE cost-form literals are container evidence, not inferred runtime dispatch.
+No standalone installer or identity is invented; the wallet image is editorial.
+
+Set BOOTDISK_REMAINING_INVENTORIES to the preserved inventory directory and
+BOOTDISK_SPECIAL_MANIFEST to the K-CD 15/2001 manifest for source-media tests.
