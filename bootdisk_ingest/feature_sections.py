@@ -1,4 +1,4 @@
-"""Bounded static profiles for K-CD 1/2000, 4/2000 and 9/2000 feature sections. Never executes Lingo."""
+"""Bounded static profiles for K-CD 1/2000, 4/2000, 9/2000 and 13/2000 feature sections. Never executes Lingo."""
 from pathlib import Path
 import argparse,json,hashlib
 from .legacy_tools import observe as observe_workshop
@@ -7,7 +7,7 @@ from .core.inventory import FileRecord
 from .output import write_manifest
 
 def qualify(w, inventory, root, *, medium="kcd-1-2000"):
- if medium not in {"kcd-1-2000", "kcd-4-2000", "kcd-9-2000"}:raise ValueError("Unsupported feature medium")
+ if medium not in {"kcd-1-2000", "kcd-4-2000", "kcd-9-2000", "kcd-13-2000"}:raise ValueError("Unsupported feature medium")
  from bootdisk_ingest.adapters.kcd.director import calls,go_targets,launch_path,raw_value
  def frame(label):
   nums=w.labels.get(label,[])
@@ -37,8 +37,8 @@ def qualify(w, inventory, root, *, medium="kcd-1-2000"):
   return primary[0],other
  main=frame(b'Knap0');main_targets=go_targets(action(main),b'enterframe')
  profile=[('Toonworks',b'Knap2',b'Edutainment',b'E2',b'E4',b'BChicken',25,24),('PicturesToExe',b'Knap5',b'Multimedie',b'M2',b'M4',b'NChicken',15,8),('WindowBlinds',b'Surprise',b'Overraskelsen',b'O2',b'O4',b'OChicken',14,10)]
- if medium in {'kcd-4-2000', 'kcd-9-2000'}:
-  names=(['Animated Memory','Home Gene Splicing','FontPage'] if medium == 'kcd-4-2000' else ['Bubblet!','PhotoPrinter','MCP Mouse Milage'])
+ if medium in {'kcd-4-2000', 'kcd-9-2000', 'kcd-13-2000'}:
+  names=(['Animated Memory','Home Gene Splicing','FontPage'] if medium == 'kcd-4-2000' else ['Bubblet!','PhotoPrinter','MCP Mouse Milage'] if medium == 'kcd-9-2000' else ['Nerf ArenaBlast','Adastra','Audio Notes Recorder'])
   profile=[(name,*row[1:]) for name,row in zip(names,profile)]
  entries=[]
  for name,menu,section,selector,install,warning,heading_channel,description_channel in profile:
@@ -87,7 +87,7 @@ def observe(source_root, inventory_manifest, *, context=None, medium="kcd-1-2000
             'files': {'referenced': {'launch': {**file, 'exists': True, 'resolved_path': file['path']}},
                 'discovered': {}, 'inventory_refs': [file['path']]},
             'content_identity': build_content_identity([FileRecord(**file)])})
-    if medium == 'kcd-9-2000':
+    if medium in {'kcd-9-2000', 'kcd-13-2000'}:
         for entry, menu_frame, title_channel in zip(entries, [46,55,156], [26,26,19]):
             entry['evidence']['menu_title'] = context['workshop'].text(context['workshop'].frames[menu_frame-1], title_channel)
             for control in entry['evidence']['other_launch_controls']:
@@ -100,6 +100,9 @@ def observe(source_root, inventory_manifest, *, context=None, medium="kcd-1-2000
     if medium == 'kcd-9-2000':
         base['generator']['version'] = 'feature-sections-3'
         base['source']['profile'] = 'additive K-CD 9/2000 feature sections; feature-sections-3'
+    if medium == 'kcd-13-2000':
+        base['generator']['version'] = 'feature-sections-4'
+        base['source']['profile'] = 'additive K-CD 13/2000 feature sections; feature-sections-4'
     base['source']['navigation'] = [r['evidence']['menu_button'] for r in rows]
     base['source']['limitations'] = ['Bounded static profile, not runtime or whole-disc completeness',
         'Shared warning controls retained; channel 91 association follows existing K-CD convention']
@@ -115,7 +118,7 @@ def main():
     parser.add_argument('inventory_manifest', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--images', type=Path)
-    parser.add_argument('--medium', choices=['kcd-1-2000','kcd-4-2000','kcd-9-2000'], default='kcd-1-2000')
+    parser.add_argument('--medium', choices=['kcd-1-2000','kcd-4-2000','kcd-9-2000','kcd-13-2000'], default='kcd-1-2000')
     args = parser.parse_args()
     for target in (args.output, args.images):
         if target is not None and (target.exists() or target.is_symlink() or
