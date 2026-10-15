@@ -161,3 +161,22 @@ are not invented.
 ## Additional workshop shelves
 
 For the six qualified 2000–2001 CDs whose tools are in Director shelves rather than Tools.dtx, also run the [additive workshop stage](docs/legacy-workshop.md). A successful main-menu ingest alone is not whole-disc completeness.
+
+### K-CD 1/2000 feature sections
+
+`python -m bootdisk_ingest.feature_sections SOURCE INVENTORY --output NEW_MANIFEST --images NEW_IMAGES`
+adds a separate observation manifest for Toonworks, PicturesToExe and WindowBlinds.
+It retains original Norwegian text, static main-menu/section bindings, verified
+launch-file identities and original section illustrations. It neither modifies
+older manifests nor infers software identity, version or distribution.
+
+The warning page's channel-91 launch is a documented K-CD profile convention.
+The shared channel-16 Heart setup control is retained separately; click priority
+and section-entry animation are not executed or certified. These limitations are
+explicit source issues. Artwork is section illustration, not a program logo or
+screenshot. This bounded profile does not certify whole-disc coverage.
+
+Mounted-media checks: set `BOOTDISK_FEATURE_INVENTORY` to the preserved K-CD 1/2000
+inventory and run `python -m unittest discover -s tests`. Seven feature checks
+cover source title/text, extra controls, missing/ambiguous navigation, changed
+file hashes, missing continuation and preservation of all three illustrations.

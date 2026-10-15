@@ -10,7 +10,7 @@ from .formats.director import DirectorError
 from .formats.director.binary import View
 
 
-def extract(manifest_path, context, output):
+def extract(manifest_path, context, output, *, selection_rule='artwork of the same shelf sprite whose behavior selects the workshop destination'):
     raw=Path(manifest_path).read_bytes();manifest=json.loads(raw);ref='sha256:'+hashlib.sha256(raw).hexdigest()
     w=context['workshop'];archives=context['archives'];sources={s['path']:{k:s[k] for k in ('path','size','sha256')} for s in context['sources']}
     bindings={b['library']:b['source_path'] for b in context['bindings']}
@@ -50,7 +50,7 @@ def extract(manifest_path, context, output):
             if palette is not None and palette['size']!=1536:raise DirectorError('Incomplete shelf palette')
             assets.append({'entry_source_id':entry['source_id'],'entry_title':entry['normalized']['title'],'kind':'icon',
                 'source_ref':{'manifest':ref,'entry':entry['source_id']},
-                'selection':{**w.location(frame,sprite,link),'rule':'artwork of the same shelf sprite whose behavior selects the workshop destination'},
+                'selection':{**w.location(frame,sprite,link),'rule':selection_rule},
                 'pixels':child(link,'BITD'),'palette':palette,'metadata':resource(link.library,link.cast.resource_id,'CASt'),
                 'raster':{'width':layout['width'],'height':layout['height'],'row_stride':layout['row_stride'],
                           'encoding':'argb32-d6-rle257-or-raw' if direct else 'indexed8-rle257-or-raw','palette_encoding':'rgb16be-high-byte'}})
