@@ -188,3 +188,10 @@ as a separate control, not turned into a fourth editorial post or package.
 Set `BOOTDISK_FEATURE_KCD4_INVENTORY` to enable the two mounted-media checks.
 Selecting the wrong disc profile must fail title qualification. Existing K-CD
 1/2000 observations remain structurally identical to the published manifest.
+
+K-CD 9/2000 uses `--medium kcd-9-2000`: Bubblet!, PhotoPrinter and MCP Mouse
+Milage. Original detail headings remain unchanged. The separate menu title
+«PhotoPrinter 2.0 LE» is retained as evidence, not silently promoted to a curated
+software version. Additional warning controls include a stale FontPage/VBRun60.EXE
+reference absent from this disc; this is an explicit source issue, not a fourth
+program. Set `BOOTDISK_FEATURE_KCD9_INVENTORY` for five mounted-media checks.
