@@ -180,3 +180,11 @@ Mounted-media checks: set `BOOTDISK_FEATURE_INVENTORY` to the preserved K-CD 1/2
 inventory and run `python -m unittest discover -s tests`. Seven feature checks
 cover source title/text, extra controls, missing/ambiguous navigation, changed
 file hashes, missing continuation and preservation of all three illustrations.
+
+K-CD 4/2000 uses the explicit `--medium kcd-4-2000` profile. It preserves the
+original detail headings Animated Memory, Home Gene Splicing and FontPage. The
+FontPage warning page also references Visual Basic 6 Runtime; this is retained
+as a separate control, not turned into a fourth editorial post or package.
+Set `BOOTDISK_FEATURE_KCD4_INVENTORY` to enable the two mounted-media checks.
+Selecting the wrong disc profile must fail title qualification. Existing K-CD
+1/2000 observations remain structurally identical to the published manifest.
