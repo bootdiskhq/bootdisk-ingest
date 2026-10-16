@@ -99,3 +99,24 @@ class ToolsDtxTests(unittest.TestCase):
         d=json.loads((out/'extraction.json').read_text())
         self.assertEqual(d['source']['supplemental_metadata'],m['source']['supplemental_metadata'])
         self.assertEqual(len(d['entries']),3)
+
+    def test_nested_tools_resolves_relative_folders_and_preserves_raw(self):
+        nested=self.root/'Tools'/'Tools.dtx'
+        raw=self.raw.replace(b'Folder=Tools\\',b'Folder=')
+        nested.write_bytes(raw)
+        m=self.run_disc();e=m['entries'][1]
+        self.assertEqual(e['raw']['Folder'],'AdAware')
+        self.assertEqual(e['normalized']['folder'],'Tools/AdAware')
+        self.assertEqual(e['files']['referenced']['installer']['resolved_path'],'Tools/AdAware/Setup.exe')
+        self.assertEqual(e['evidence']['metadata_source']['path'],'Tools/Tools.dtx')
+        self.assertEqual(base64.b64decode(m['source']['supplemental_metadata'][0]['raw_base64']),raw)
+        self.assertEqual(m['source']['coverage']['unprocessed_metadata'],[])
+
+    def test_both_tools_locations_are_rejected(self):
+        self.tools.write_bytes(self.raw)
+        (self.root/'Tools'/'Tools.dtx').write_bytes(self.raw)
+        with self.assertRaisesRegex(ValueError,'Ambiguous Tools'):self.run_disc()
+
+    def test_nested_tools_cannot_escape_its_directory(self):
+        (self.root/'Tools'/'Tools.dtx').write_bytes(b'[I1]\nNavn=Bad\nFolder=../Other\n')
+        with self.assertRaisesRegex(ValueError,'unsafe'):self.run_disc()
