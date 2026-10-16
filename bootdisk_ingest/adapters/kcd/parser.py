@@ -302,6 +302,11 @@ def parse_disc(
                 )
             )
 
+    primary_ids = [entry["source_id"] for entry in entries]
+    from .calendar import parse_calendar
+    calendar_entries, calendar_source = parse_calendar(disc_root, disc_inventory)
+    entries.extend(calendar_entries)
+
     for entry in entries:
         if (entry.get("raw", {}).get("Global") or "").strip():
             continue
@@ -330,9 +335,8 @@ def parse_disc(
 
     # Append supplementary source entries after the unchanged K.DTX projection.
     from .tools import parse_tools, metadata_coverage
-    primary_ids = [entry["source_id"] for entry in entries]
     tool_entries, tools_source = parse_tools(disc_root, disc_inventory)
-    if set(primary_ids) & {entry["source_id"] for entry in tool_entries}:
+    if {entry["source_id"] for entry in entries} & {entry["source_id"] for entry in tool_entries}:
         raise ValueError("Duplicate source IDs across DTX metadata files")
     entries.extend(tool_entries)
 
@@ -343,8 +347,8 @@ def parse_disc(
     source["parser_warnings"] = warnings
     source["sections"] = {name: dict(config[name]) for name in config.sections()}
     source["defaults"] = dict(config.defaults())
-    source["supplemental_metadata"] = [tools_source] if tools_source else []
-    source["coverage"] = metadata_coverage(disc_inventory, config.sections(), primary_ids, tools_source, entries)
+    source["supplemental_metadata"] = [s for s in (tools_source, calendar_source) if s]
+    source["coverage"] = metadata_coverage(disc_inventory, config.sections(), primary_ids, tools_source, entries, calendar=calendar_source)
     if tools_source:
         warnings.extend("Tools.dtx: " + warning for warning in tools_source["parser_warnings"])
     coverage = source["coverage"]

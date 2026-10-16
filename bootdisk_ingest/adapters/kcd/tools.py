@@ -75,8 +75,10 @@ def parse_tools(disc_root, inventory):
     return entries, document
 
 
-def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries):
+def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries, calendar=None):
     processed = ["K.DTX"] + ([tools["resolved_path"]] if tools else [])
+    if calendar:
+        processed.append(calendar["resolved_path"])
     unknown = [f["path"] for f in inventory["files"]
                if f["path"].lower().endswith(".dtx") and f["path"].casefold() not in {p.casefold() for p in processed}]
     primary_skipped = [s for s in primary_sections if s != "Generelt" and s not in primary_ids]
@@ -84,6 +86,9 @@ def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries):
     if tools:
         sections.append({"path": tools["resolved_path"], "projected_entry_ids": tools["projected_entry_ids"],
                          "unprojected_sections": tools["unprojected_sections"]})
+    if calendar:
+        sections.append({"path": calendar["resolved_path"], "projected_entry_ids": calendar["projected_entry_ids"],
+                         "unprojected_sections": calendar["unprojected_sections"]})
     folders = {}
     for entry in entries:
         folder = entry["normalized"]["folder"]
