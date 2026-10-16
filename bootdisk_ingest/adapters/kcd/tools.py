@@ -10,10 +10,15 @@ from bootdisk_ingest.inventory import get_file_record
 
 def parse_tools(disc_root, inventory):
     from .parser import build_entry
-    metadata = get_file_record(inventory, "Tools.dtx")
-    if not metadata.get("exists"):
+    candidates = [get_file_record(inventory, name) for name in ("Tools.dtx", "Tools/Tools.dtx")]
+    found = [item for item in candidates if item.get("exists")]
+    if not found:
         return [], None
-    relative = metadata.get("resolved_path", "Tools.dtx")
+    if len(found) != 1:
+        raise ValueError("Ambiguous Tools.dtx locations; retain both and investigate")
+    metadata = found[0]
+    relative = metadata.get("resolved_path", metadata["path"])
+    folder_base = PurePosixPath(relative).parent
     path = Path(disc_root) / relative
     if not path.resolve().is_relative_to(Path(disc_root).resolve()):
         raise ValueError("Tools.dtx escapes media")
@@ -54,6 +59,9 @@ def parse_tools(disc_root, inventory):
         # fields (Navn/InstruksNo), never fabricated Titel/Global in source data.
         projected = {k: values[k] for k in ("Folder", "Setup", "Run", "Licens", "Websted") if k in values}
         projected.update(Titel=values["Navn"], Global=values.get("InstruksNo", ""))
+        # In the nested layout Folder is relative to the Tools menu directory.
+        # Raw values stay untouched; only the file-observation projection is rooted.
+        projected["Folder"] = str(folder_base / values["Folder"].strip().replace("\\", "/"))
         entry = build_entry(inventory, section, projected)
         entry["raw"] = values
         # The Tools Ja flags include Spil on AdAware. They are not K.DTX category
@@ -65,9 +73,10 @@ def parse_tools(disc_root, inventory):
                                  "text": values.get("InstruksNo")}}
         entry["interpretations"]["tools_projection"] = {
             "method": "tools-dtx-norwegian-1", "title_field": "Navn", "description_field": "InstruksNo",
+            "folder_base": str(folder_base),
             "category_policy": "Tools flags and Kategori numbers are retained raw, not mapped to content kind"}
         entries.append(entry)
-    document = {"path": "Tools.dtx", "resolved_path": relative, "encoding": "cp1252",
+    document = {"path": relative, "resolved_path": relative, "encoding": "cp1252",
                 "size": len(raw), "sha256": metadata["sha256"], "raw_base64": base64.b64encode(raw).decode("ascii"),
                 "sections": {s: dict(config[s]) for s in config.sections()}, "defaults": dict(config.defaults()),
                 "parser_warnings": warnings, "projected_entry_ids": [e["source_id"] for e in entries],
