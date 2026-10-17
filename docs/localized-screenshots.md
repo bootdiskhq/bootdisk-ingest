@@ -14,6 +14,7 @@ observed filename casing remain recorded; no image is inferred from a title.
 Regression tests cover PNG discovery, Norwegian priority, mixed-case names,
 foreign-only files, another folder, ambiguity and existing JPG/BMP precedence.
 The nine affected format-batch CDs are rebuilt from preserved source files;
-Publish verifies selected image bytes against the previous preservation extraction.
+Publish verifies selected image bytes against a fresh image-only preservation extraction.
+Full inventories and original metadata are compared with the previous observations.
 Their per-medium screenshot minimums are raised to the verified source coverage,
 so losing the selected screenshots blocks subsequent package builds.
