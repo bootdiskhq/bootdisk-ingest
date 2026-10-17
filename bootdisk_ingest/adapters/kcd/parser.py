@@ -14,6 +14,7 @@ from bootdisk_ingest.config import (
     SCHEMA_VERSION,
 )
 from .localized import title_field
+from .screenshots import screenshot_path
 from .config import KNOWN_ASSETS, KNOWN_NON_CATEGORY_FIELDS, SOURCE_FORMAT
 from bootdisk_ingest.core.identity import build_content_identity
 from bootdisk_ingest.formats.rtf import plain_text, METHOD as RTF_METHOD
@@ -134,12 +135,8 @@ def build_entry(
             filename,
         )
 
-        # Earlier DTX discs also use Shot.bmp. Preserve the established JPG
-        # convention when both exist; only fall back when JPG is absent.
-        if asset_type == "screenshot" and not get_file_record(disc_inventory, asset_path).get("exists"):
-            bitmap_path = relative_disc_path(folder, "Shot.bmp")
-            if get_file_record(disc_inventory, bitmap_path).get("is_file"):
-                asset_path = bitmap_path
+        if asset_type == "screenshot":
+            asset_path = screenshot_path(disc_inventory, folder)
 
         discovered_assets[asset_type] = (
             get_file_record(
