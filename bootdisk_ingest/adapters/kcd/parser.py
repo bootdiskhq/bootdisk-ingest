@@ -13,6 +13,7 @@ from bootdisk_ingest.config import (
     PARSER_VERSION,
     SCHEMA_VERSION,
 )
+from .localized import title_field
 from .config import KNOWN_ASSETS, KNOWN_NON_CATEGORY_FIELDS, SOURCE_FORMAT
 from bootdisk_ingest.core.identity import build_content_identity
 from bootdisk_ingest.formats.rtf import plain_text, METHOD as RTF_METHOD
@@ -154,7 +155,7 @@ def build_entry(
 
     normalized = {
         "title": normalize_string(
-            raw.get("Titel")
+            raw.get(title_field(raw))
         ),
         "short_title": normalize_string(
             raw.get("KortTitel")
@@ -340,6 +341,8 @@ def parse_disc(
         raise ValueError("Duplicate source IDs across DTX metadata files")
     entries.extend(tool_entries)
 
+    from .lessons import observe_lessons
+    lessons = observe_lessons(disc_root, disc_inventory, entries)
     source = build_source_metadata(disc_inventory)
     source["dtx_file"]["raw_base64"] = base64.b64encode(raw_bytes).decode("ascii")
     if metadata.get("resolved_path"):
@@ -347,8 +350,8 @@ def parse_disc(
     source["parser_warnings"] = warnings
     source["sections"] = {name: dict(config[name]) for name in config.sections()}
     source["defaults"] = dict(config.defaults())
-    source["supplemental_metadata"] = [s for s in (tools_source, calendar_source) if s]
-    source["coverage"] = metadata_coverage(disc_inventory, config.sections(), primary_ids, tools_source, entries, calendar=calendar_source)
+    source["supplemental_metadata"] = [s for s in (tools_source, calendar_source) if s] + lessons
+    source["coverage"] = metadata_coverage(disc_inventory, config.sections(), primary_ids, tools_source, entries, calendar=calendar_source, lessons=lessons)
     if tools_source:
         warnings.extend("Tools.dtx: " + warning for warning in tools_source["parser_warnings"])
     coverage = source["coverage"]
