@@ -6,14 +6,20 @@ from pathlib import Path, PurePosixPath
 import re
 
 from bootdisk_ingest.inventory import get_file_record
+from .dtx_text import ini_projection
 
 
 def parse_tools(disc_root, inventory):
     from .parser import build_entry
-    metadata = get_file_record(inventory, "Tools.dtx")
-    if not metadata.get("exists"):
+    candidates = [get_file_record(inventory, name) for name in ("Tools.dtx", "Tools/Tools.dtx")]
+    found = [item for item in candidates if item.get("exists")]
+    if not found:
         return [], None
-    relative = metadata.get("resolved_path", "Tools.dtx")
+    if len(found) != 1:
+        raise ValueError("Ambiguous Tools.dtx locations; retain both and investigate")
+    metadata = found[0]
+    relative = metadata.get("resolved_path", metadata["path"])
+    folder_base = PurePosixPath(relative).parent
     path = Path(disc_root) / relative
     if not path.resolve().is_relative_to(Path(disc_root).resolve()):
         raise ValueError("Tools.dtx escapes media")
@@ -26,6 +32,9 @@ def parse_tools(disc_root, inventory):
     except UnicodeDecodeError:
         text = raw.decode("cp1252", errors="replace")
         warnings.append("Undefined CP1252 bytes replaced; original bytes retained")
+    text, continuation_lines = ini_projection(text)
+    if continuation_lines:
+        warnings.append('Unindented prose continuation retained at lines: ' + ', '.join(map(str, continuation_lines)))
     # Preserve duplicates in the raw bytes and warn about the lossy INI view,
     # using the same explicit last-value-wins policy as K.DTX.
     strict = configparser.ConfigParser(interpolation=None)
@@ -54,6 +63,9 @@ def parse_tools(disc_root, inventory):
         # fields (Navn/InstruksNo), never fabricated Titel/Global in source data.
         projected = {k: values[k] for k in ("Folder", "Setup", "Run", "Licens", "Websted") if k in values}
         projected.update(Titel=values["Navn"], Global=values.get("InstruksNo", ""))
+        # In the nested layout Folder is relative to the Tools menu directory.
+        # Raw values stay untouched; only the file-observation projection is rooted.
+        projected["Folder"] = str(folder_base / values["Folder"].strip().replace("\\", "/"))
         entry = build_entry(inventory, section, projected)
         entry["raw"] = values
         # The Tools Ja flags include Spil on AdAware. They are not K.DTX category
@@ -65,20 +77,23 @@ def parse_tools(disc_root, inventory):
                                  "text": values.get("InstruksNo")}}
         entry["interpretations"]["tools_projection"] = {
             "method": "tools-dtx-norwegian-1", "title_field": "Navn", "description_field": "InstruksNo",
+            "folder_base": str(folder_base),
             "category_policy": "Tools flags and Kategori numbers are retained raw, not mapped to content kind"}
         entries.append(entry)
-    document = {"path": "Tools.dtx", "resolved_path": relative, "encoding": "cp1252",
+    document = {"path": relative, "resolved_path": relative, "encoding": "cp1252",
                 "size": len(raw), "sha256": metadata["sha256"], "raw_base64": base64.b64encode(raw).decode("ascii"),
                 "sections": {s: dict(config[s]) for s in config.sections()}, "defaults": dict(config.defaults()),
+                "text_projection": {"method": "dtx-prose-continuation-1", "continuation_lines": continuation_lines},
                 "parser_warnings": warnings, "projected_entry_ids": [e["source_id"] for e in entries],
                 "unprojected_sections": skipped}
     return entries, document
 
 
-def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries, calendar=None):
+def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries, calendar=None, lessons=()):
     processed = ["K.DTX"] + ([tools["resolved_path"]] if tools else [])
     if calendar:
         processed.append(calendar["resolved_path"])
+    processed.extend(d["resolved_path"] for d in lessons)
     unknown = [f["path"] for f in inventory["files"]
                if f["path"].lower().endswith(".dtx") and f["path"].casefold() not in {p.casefold() for p in processed}]
     primary_skipped = [s for s in primary_sections if s != "Generelt" and s not in primary_ids]
@@ -89,6 +104,8 @@ def metadata_coverage(inventory, primary_sections, primary_ids, tools, entries, 
     if calendar:
         sections.append({"path": calendar["resolved_path"], "projected_entry_ids": calendar["projected_entry_ids"],
                          "unprojected_sections": calendar["unprojected_sections"]})
+    sections.extend({"path": d["resolved_path"], "role": d["role"], "publication_status": d["publication_status"],
+                     "projected_entry_ids": [], "unprojected_sections": d["unprojected_sections"]} for d in lessons)
     folders = {}
     for entry in entries:
         folder = entry["normalized"]["folder"]

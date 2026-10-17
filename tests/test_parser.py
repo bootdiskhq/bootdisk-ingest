@@ -59,3 +59,21 @@ class ParserTests(unittest.TestCase):
             (root / "K.DTX").write_bytes(b"[K1]\nTitel=After")
             with self.assertRaisesRegex(ValueError, "changed"):
                 parse_disc(root, inventory)
+
+
+class LocalizedTitleTests(unittest.TestCase):
+    parse = ParserTests.parse
+    def test_norwegian_title_over_common_and_other_languages(self):
+        m = self.parse(b"[K1]\nTitel=Common\nTitelDK=Dansk\nTitelNO=Norsk\nGlobalNO=Omtale\n")
+        self.assertEqual(m['entries'][0]['normalized']['title'], 'Norsk')
+        self.assertEqual(m['entries'][0]['raw']['Titel'], 'Common')
+        self.assertEqual(m['source']['sections']['K1']['TitelNO'], 'Norsk')
+
+    def test_field_case_and_no_foreign_language_fallback(self):
+        for field in ('TitelNo', 'TitelNO', 'titelno'):
+            self.assertEqual(self.parse(('[K1]\n'+field+'=Norsk\n').encode())['entries'][0]['normalized']['title'], 'Norsk')
+        self.assertIsNone(self.parse(b'[K1]\nTitelDK=Dansk\n')['entries'][0]['normalized']['title'])
+
+    def test_conflicting_norwegian_fields_fail(self):
+        with self.assertRaisesRegex(ValueError, 'Conflicting'):
+            self.parse(b'[K1]\nTitelNO=One\nTitelNo=Other\n')
