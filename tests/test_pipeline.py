@@ -71,6 +71,35 @@ class PipelineTests(unittest.TestCase):
         result = ingest_kcd(self.root)
         self.assertEqual(result["entries"][0]["files"]["discovered"]["screenshot"]["path"], "App/Shot.jpg")
 
+    def test_screenshot_png_is_discovered_with_exact_hash(self):
+        image = self.root / 'App/Shot.png'; image.write_bytes(b'png bytes')
+        record = ingest_kcd(self.root)['entries'][0]['files']['discovered']['screenshot']
+        self.assertEqual(record['path'], 'App/Shot.png')
+        self.assertEqual(record['sha256'], hashlib.sha256(image.read_bytes()).hexdigest())
+
+    def test_norwegian_screenshot_precedes_neutral_and_foreign(self):
+        for name in ('ShotNO.png', 'Shot.png', 'ShotDK.png', 'Shot.jpg'):
+            (self.root / 'App' / name).write_bytes(name.encode())
+        record = ingest_kcd(self.root)['entries'][0]['files']['discovered']['screenshot']
+        self.assertEqual(record['resolved_path'], 'App/ShotNO.png')
+        self.assertEqual(record['sha256'], hashlib.sha256(b'ShotNO.png').hexdigest())
+
+    def test_foreign_screenshot_is_not_a_norwegian_fallback(self):
+        (self.root / 'App/ShotDK.png').write_bytes(b'danish')
+        record = ingest_kcd(self.root)['entries'][0]['files']['discovered']['screenshot']
+        self.assertFalse(record['exists'])
+
+    def test_screenshot_is_not_borrowed_from_another_folder(self):
+        (self.root / 'Shot.png').write_bytes(b'other entry')
+        record = ingest_kcd(self.root)['entries'][0]['files']['discovered']['screenshot']
+        self.assertFalse(record['exists'])
+
+    def test_ambiguous_screenshot_casing_is_rejected(self):
+        from bootdisk_ingest.adapters.kcd.screenshots import screenshot_path
+        inventory = {'files': [{'path':'App/ShotNo.png'}, {'path':'App/SHOTNO.PNG'}]}
+        with self.assertRaisesRegex(ValueError, 'Ambiguous screenshot'):
+            screenshot_path(inventory, 'App')
+
     def test_rtf_description_observation_keeps_original_bytes_and_global_priority(self):
         import base64
         data=br"{\rtf1\ansi Norsk bl\'e5 tekst\par }"
