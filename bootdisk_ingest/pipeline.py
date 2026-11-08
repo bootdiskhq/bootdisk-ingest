@@ -24,12 +24,16 @@ def ingest_kcd(source_root, *, image=None, generated_at=None):
         raise ValueError("The explicitly supplied image must be an existing file")
     inventory = build_inventory(source_root)
     has_dtx = get_file_record(inventory, "K.DTX")["exists"]
-    parser = parse_disc if has_dtx else parse_director_disc
+    from .adapters.kcd.html_menu import parse_disc as parse_html
+    has_html = get_file_record(inventory, "scripts/cdindex.js")["exists"]
+    if has_dtx and has_html:
+        raise ValueError("Ambiguous DTX and HTML menus")
+    parser = parse_disc if has_dtx else parse_html if has_html else parse_director_disc
     manifest = parser(source_root, inventory, generated_at=generated_at)
     manifest["media"] = build_media_metadata(image)
     manifest["disc"]["filesystem"] = inspect_iso9660(image)
     manifest["file_inventory"] = inventory["files"]
     manifest["statistics"] = build_statistics(manifest["entries"], inventory)
-    validator = build_validation if has_dtx else validate_director
+    validator = build_validation if has_dtx or has_html else validate_director
     manifest["validation"] = validator(manifest["entries"])
     return manifest

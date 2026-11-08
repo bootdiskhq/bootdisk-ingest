@@ -255,6 +255,10 @@ def print_report(
         )
 
     print()
+    if manifest["schema_version"] == "kcd-html-1":
+        print("HTML-kilderegister SHA-256:")
+        print("  " + manifest["source"]["documents"]["scripts/cdindex.js"]["sha256"])
+        return
     print("K.DTX SHA-256:")
     print(
         "  "
