@@ -73,7 +73,15 @@ def index_rows(raw):
     if not rows:raise ValueError('Empty CD index')
     return rows
 
+# Exact source defect on K-CD 14/2013. Do not accept arbitrary invalid HTML.
+FAILED_RENDER_SHA = 'b875714ab36d78c036cced89a21a14412b66e6a4ad9af57972b52033c92bb909'
+FAILED_RENDER_ROW = {'url':'html/game01.html','category':'game','title':'Big City Adventure: Tokyo'}
+
 def parse_page(raw, row):
+    if row == FAILED_RENDER_ROW and hashlib.sha256(raw).hexdigest() == FAILED_RENDER_SHA:
+        return {'title':row['title'], 'category':CATEGORIES[row['category']], 'description':None,
+                'image':None, 'references':[], 'external_links':[], 'license':None,
+                'version':None, 'source_defect':'original_page_render_failed'}
     text=raw.decode('cp1252')
     if not re.search(r'charset=iso-8859-1',text,re.I):raise ValueError('Unqualified HTML encoding')
     tree=Tree(text).root;page=row['url'];group=row['category']
@@ -129,12 +137,14 @@ def parse_disc(root, inventory, *, generated_at=None):
         if safe!=page or not page.startswith('html/'):raise ValueError('Unsafe menu page')
         if page not in documents:documents[page]=document(page)
         obs=parse_page(base64.b64decode(documents[page]['raw_base64']),row)
-        folder=posixpath.dirname(obs['image']);records=get_folder_records(inventory,folder)
+        folder=posixpath.dirname(obs['image']) if obs['image'] else None;records=get_folder_records(inventory,folder) if folder else []
+        if obs.get('source_defect'):
+            documents[page].update(encoding='ascii', declared_encoding=None)
         refs={f'link_{i+1}':get_file_record(inventory,p) for i,p in enumerate(obs['references'])}
-        discovered={'screenshot':get_file_record(inventory,obs['image'])}
+        discovered={'screenshot':get_file_record(inventory,obs['image'])} if obs['image'] else {}
         entry_id=Path(page).stem if row['category'] not in ('articles','videos') else row['category']+Path(folder).name
         if any(e['source_id']==entry_id for e in entries):raise ValueError('Duplicate HTML entry')
-        entries.append({'source_id':entry_id,'raw':{'html_title':obs['title'],'html_description':obs['description']},'normalized':{'title':obs['title'],'short_title':None,'description':obs['description'],'folder':folder,'installer':None,'run':None,'license':obs['license'],'website':None,'requirements':{'cpu':normalize_cpu(None),'ram_mb':None,'disk_mb':None,'directx':None},'requires_network':None,'categories':[obs['category']]},'interpretations':{},'evidence':{'html_menu':{'method':METHOD,'index_position':position,'page':page,'observation':obs}},'files':{'referenced':refs,'discovered':discovered,'inventory_refs':[r['path'] for r in records]},'content_identity':build_content_identity(records)})
+        entries.append({'source_id':entry_id,'raw':({'index_title':obs['title']} if obs.get('source_defect') else {'html_title':obs['title'],'html_description':obs['description']}),'normalized':{'title':obs['title'],'short_title':None,'description':obs['description'],'folder':folder,'installer':None,'run':None,'license':obs['license'],'website':None,'requirements':{'cpu':normalize_cpu(None),'ram_mb':None,'disk_mb':None,'directx':None},'requires_network':None,'categories':[obs['category']]},'interpretations':{},'evidence':{'html_menu':{'method':METHOD,'index_position':position,'page':page,'observation':obs}},'files':{'referenced':refs,'discovered':discovered,'inventory_refs':[r['path'] for r in records]},'content_identity':build_content_identity(records)})
     # Require every actual software page and every grouped headline to be accounted for.
     projected={r['url'] for r in rows}
     candidates={f['path'] for f in inventory['files'] if re.fullmatch(r'html/(?:topical|tool|security|game|taste)\d+\.html',f['path'])}
