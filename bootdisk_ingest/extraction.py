@@ -15,7 +15,7 @@ def safe_relative(value):
     return path
 
 
-def _explicit_file_references(entry):
+def _explicit_file_references(entry, *, images_only=False):
     """Return manifest paths paired with the observed source paths to read.
 
     ``inventory_refs`` already use observed inventory paths. ``files.discovered``
@@ -30,13 +30,15 @@ def _explicit_file_references(entry):
     files = entry.get("files", {})
     refs = {
         path: path
-        for path in files.get("inventory_refs", [])
+        for path in ([] if images_only else files.get("inventory_refs", []))
         if isinstance(path, str) and path
     }
 
     discovered = files.get("discovered", {})
     if isinstance(discovered, dict):
-        for observation in discovered.values():
+        for kind, observation in discovered.items():
+            if images_only and kind not in ("screenshot", "icon"):
+                continue
             if not isinstance(observation, dict):
                 continue
             if observation.get("exists") is not True:
@@ -52,7 +54,7 @@ def _explicit_file_references(entry):
     return sorted(refs.items())
 
 
-def extract_entries(root, manifest, destination):
+def extract_entries(root, manifest, destination, *, images_only=False):
     """Create a new directory with verified copies and per-entry source metadata.
 
     The destination must not exist. On failure remove only the directory created
@@ -72,7 +74,7 @@ def extract_entries(root, manifest, destination):
     planned = []
     for index, entry in enumerate(manifest["entries"], 1):
         refs = []
-        for manifest_ref, source_ref in _explicit_file_references(entry):
+        for manifest_ref, source_ref in _explicit_file_references(entry, images_only=images_only):
             target_path = safe_relative(manifest_ref)
             observed_path = safe_relative(source_ref)
 
@@ -103,7 +105,8 @@ def extract_entries(root, manifest, destination):
     try:
         summary = {
             "schema_version": "bootdisk-extraction-1",
-            "scope": "Explicit manifest file references; not a complete software-package claim",
+            "scope": ("Explicit screenshot/icon observations only; program payloads remain in original source image"
+                      if images_only else "Explicit manifest file references; not a complete software-package claim"),
             "disc": manifest["disc"],
             "source": manifest["source"],
             "entries": [],
