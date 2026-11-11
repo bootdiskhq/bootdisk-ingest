@@ -300,6 +300,8 @@ def parse_disc(
                 )
             )
 
+    from .late_dtx import late_entries
+    quiz_docs = late_entries(disc_root,disc_inventory,metadata["sha256"],text,disc_raw,entries)
     primary_ids = [entry["source_id"] for entry in entries]
     from .calendar import parse_calendar
     calendar_entries, calendar_source = parse_calendar(disc_root, disc_inventory)
@@ -339,7 +341,7 @@ def parse_disc(
     entries.extend(tool_entries)
 
     from .lessons import observe_lessons
-    lessons = observe_lessons(disc_root, disc_inventory, entries)
+    lessons = observe_lessons(disc_root, disc_inventory, entries) + quiz_docs
     source = build_source_metadata(disc_inventory)
     source["dtx_file"]["raw_base64"] = base64.b64encode(raw_bytes).decode("ascii")
     if metadata.get("resolved_path"):

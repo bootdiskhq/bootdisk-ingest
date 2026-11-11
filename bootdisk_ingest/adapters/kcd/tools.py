@@ -11,7 +11,7 @@ from .dtx_text import ini_projection
 
 def parse_tools(disc_root, inventory):
     from .parser import build_entry
-    candidates = [get_file_record(inventory, name) for name in ("Tools.dtx", "Tools/Tools.dtx")]
+    candidates = [get_file_record(inventory, name) for name in ("Tools.dtx", "Tools/Tools.dtx", "Knuser.dtx", "Tools/Knuser.dtx")]
     found = [item for item in candidates if item.get("exists")]
     if not found:
         return [], None
@@ -20,6 +20,11 @@ def parse_tools(disc_root, inventory):
     metadata = found[0]
     relative = metadata.get("resolved_path", metadata["path"])
     folder_base = PurePosixPath(relative).parent
+    if relative.casefold().endswith('knuser.dtx'):
+        known={'knuser.dtx':'ed0d9a86c7b05824f5e93d1c2f9a53ff9f94edec897dddefcbbefb1cc69bbadf',
+               'tools/knuser.dtx':'36e897ee5354be368ac5a560a40c86adb50a2aff3725c18f69f9e1e4004a449e'}
+        if metadata['sha256']!=known.get(relative.casefold()):raise ValueError('Unqualified Knuser layout')
+        folder_base=PurePosixPath('.')  # Folder already starts at CD root.
     path = Path(disc_root) / relative
     if not path.resolve().is_relative_to(Path(disc_root).resolve()):
         raise ValueError("Tools.dtx escapes media")
