@@ -196,3 +196,30 @@ class ExtractionTests(unittest.TestCase):
         self.assertEqual(status, 1)
         self.assertTrue(output.exists())
         self.assertTrue((self.dest / "extraction.json").exists())
+
+class ImageOnlyExtractionTests(unittest.TestCase):
+    setUp = ExtractionTests.setUp
+    def test_images_only_preserves_full_evidence_without_copying_program_or_rtf(self):
+        import copy
+        entry=self.manifest['entries'][0]
+        entry['files']['discovered']={}
+        for name,kind in [('Shot.jpg','screenshot'),('Icon.ico','icon'),('No.rtf','description_rtf')]:
+            raw=name.encode();(self.root/name).write_bytes(raw)
+            record={'path':name,'size':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+            self.manifest['file_inventory'].append(record)
+            entry['files']['discovered'][kind]=dict(record,exists=True,is_file=True)
+        before=copy.deepcopy(self.manifest)
+        result=extract_entries(self.root,self.manifest,self.dest,images_only=True)
+        self.assertEqual({r['path'] for r in result['entries'][0]['copied_files']},{'Shot.jpg','Icon.ico'})
+        self.assertFalse((self.dest/'0001/files/Setup.exe').exists())
+        self.assertFalse((self.dest/'0001/files/No.rtf').exists())
+        self.assertEqual(json.loads((self.dest/'0001/entry.json').read_text()),entry)
+        self.assertEqual(before,self.manifest)
+        self.assertIn('observations only',result['scope'])
+        self.assertTrue((self.root/'Setup.exe').exists())
+    def test_images_only_still_checks_source_hashes(self):
+        record=self.manifest['file_inventory'][0]
+        self.manifest['entries'][0]['files']['discovered']={'screenshot':dict(record,exists=True,is_file=True)}
+        (self.root/'Setup.exe').write_bytes(b'changed')
+        with self.assertRaises(ValueError):extract_entries(self.root,self.manifest,self.dest,images_only=True)
+        self.assertFalse(self.dest.exists())

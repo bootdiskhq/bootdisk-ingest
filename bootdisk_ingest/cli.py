@@ -16,6 +16,7 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Observe K-CD source files without modifying them")
     parser.add_argument("source_root", nargs="?", default=".", type=Path)
     parser.add_argument("--extract-to", type=Path, help="Copy explicit inventory references and metadata to a new directory")
+    parser.add_argument("--extract-images-only", action="store_true", help="With --extract-to, preserve only observed screenshots/icons; keep full inventory and entry evidence")
     parser.add_argument("--image", type=Path, help="Original image, independently hashed")
     parser.add_argument("--output", type=Path, default=Path("ingest-manifest.json"),
                         help="Manifest outside the source tree (default: ./ingest-manifest.json)")
@@ -40,6 +41,8 @@ def main(argv=None):
             raise ValueError("Output must not replace the original image")
         if output.exists() and not args.force:
             raise ValueError("Output already exists; use --force to replace it")
+        if args.extract_images_only and not args.extract_to:
+            raise ValueError("--extract-images-only requires --extract-to")
         if args.extract_to:
             extraction = args.extract_to.expanduser().resolve()
             if args.extract_to.expanduser().exists() or args.extract_to.expanduser().is_symlink():
@@ -53,7 +56,7 @@ def main(argv=None):
             generated_at = datetime.fromtimestamp(int(os.environ["SOURCE_DATE_EPOCH"]), timezone.utc).isoformat()
         manifest = ingest_kcd(root, image=args.image, generated_at=generated_at)
         if args.extract_to:
-            extract_entries(root, manifest, args.extract_to)
+            extract_entries(root, manifest, args.extract_to, images_only=args.extract_images_only)
         write_manifest(manifest, output, overwrite=args.force)
         if not args.quiet:
             print_report(manifest, output)
