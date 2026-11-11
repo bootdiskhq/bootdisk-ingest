@@ -4,6 +4,13 @@ from bootdisk_ingest.adapters.kcd.html_menu import index_rows,parse_page,local_p
 PAGE='''<meta content="text/html; charset=iso-8859-1"><div id="content"><h1>Prøve</h1><ul class="softwaredetails"><li>Versjon: 2.1</li><li>Lisenstype: Gratis</li></ul><p class="softwaredesc">Original &amp; norsk.<br>Andre linje.</p><img class="softwareimage" src="../topical/01/image.jpg"><a href="../topical/01/setup.exe">Installer</a></div>'''.encode('latin1')
 ROW={'title':'Prøve','url':'html/topical01.html','category':'topical'}
 class HtmlTest(unittest.TestCase):
+ def test_original_renderer_failure_is_bound_to_bytes_and_index(self):
+  from bootdisk_ingest.adapters.kcd.html_menu import FAILED_RENDER_ROW
+  raw=b'Could not render http://mediafunnel.bonnier.local/komputer/render/76e0248e-898d-41cd-a474-1d96b7b304a3/KFA_14_2013/nb-NO/game/1'
+  obs=parse_page(raw,FAILED_RENDER_ROW)
+  self.assertEqual((obs['description'],obs['image'],obs['references']), (None,None,[]))
+  for data,row in [(raw+b'!',FAILED_RENDER_ROW),(raw,dict(FAILED_RENDER_ROW,title='Another game'))]:
+   with self.assertRaises(ValueError):parse_page(data,row)
  def test_fields_and_source_links(self):
   r=parse_page(PAGE,ROW);self.assertEqual(r['description'],'Original & norsk.\nAndre linje.');self.assertEqual(r['references'],['topical/01/setup.exe']);self.assertEqual(r['version'],'2.1');self.assertEqual(r['license'],'Gratis')
  def test_html_latin1_label_uses_windows_1252(self):
