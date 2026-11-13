@@ -125,6 +125,11 @@ def build_entry(
             )
         )
 
+    fields = {key.casefold(): value for key, value in raw.items()}
+    pdf = normalize_windows_path(normalize_string(fields.get("pdfno") or fields.get("pdf")))
+    if pdf and pdf.lower().endswith(".pdf"):
+        referenced_files["guide_pdf"] = get_file_record(disc_inventory, relative_disc_path(folder, pdf))
+
     discovered_assets = {}
 
     for asset_type, filename in (
